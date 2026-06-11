@@ -2,7 +2,7 @@
 
 **Proyecto:** Tricor Hábitat  
 **Versión del documento:** v0.1  
-**Estado:** DRAFT — índice maestro generado para revisión  
+**Estado:** CERTIFIED — fuente única del estado documental global
 **Fecha:** 2026-06-11  
 **Repositorio fuente:** `https://github.com/manzur316/Tricore-Habit`  
 **Branch auditada:** `main`  
@@ -31,7 +31,13 @@ Este archivo no reemplaza los documentos técnicos. Solo define:
 
 ## 2. Reglas de uso
 
-### 2.1 Fuente única de verdad
+### 2.1 Fuente única de verdad documental
+
+`DOCS_INDEX_AND_DEPENDENCY_MAP.md` es la fuente única del estado documental global.
+
+`README.md` es la puerta de entrada humana del repositorio.
+
+Los demás documentos deben declarar solo su estado propio. Si necesitan hablar del estado global del handoff, deben indicar: ver `DOCS_INDEX_AND_DEPENDENCY_MAP.md`.
 
 La fuente operativa actual es el repositorio:
 
@@ -66,7 +72,15 @@ Definición:
 
 ### 2.3 Regla de handoff
 
-No entregar a Claude Code CLI hasta que, como mínimo, estén actualizados:
+El handoff documental a Claude Code CLI está en:
+
+```text
+READY_FOR_BOOTSTRAP_REVIEW
+```
+
+Esto habilita revisión humana del bootstrap técnico. No habilita implementación productiva, providers reales ni pagos reales.
+
+Documentos mínimos ya actualizados para esta revisión:
 
 ```text
 DOCS_INDEX_AND_DEPENDENCY_MAP.md
@@ -74,6 +88,13 @@ PROVIDER_STRATEGY_AND_CANONICAL_CONTRACTS_V0.1.md
 QA_HARNESS_SPEC_V0.1.md
 ROADMAP_V0.1.md
 AI_AGENT_RULES_AND_HANDOFF.md
+README.md
+```
+
+La implementación productiva sigue:
+
+```text
+BLOCKED hasta bootstrap técnico + QA Harness + labs.
 ```
 
 ---
@@ -82,7 +103,7 @@ AI_AGENT_RULES_AND_HANDOFF.md
 
 | Documento | Estado actual | Función | Dependencias base | Dependientes | Acción recomendada |
 |---|---|---|---|---|---|
-| `README.md` | REVIEW_REQUIRED | Entrada del repo | Este índice | Todos | Actualizar después del índice y roadmap. |
+| `README.md` | CERTIFIED | Puerta de entrada humana del repo | Este índice | Todos | Mantener como navegación humana; estado global aquí. |
 | `PROJECT_CHARTER_TRICOR_HABITAT.md` | CERTIFIED | Documento rector del producto | Ninguna | Todos | No tocar por ahora. |
 | `DOMAIN_MODEL_V0.1.md` | CERTIFIED | Modelo de dominio | Project Charter | Policy, Cloud/Edge, Providers, QA | No tocar por ahora. |
 | `ACCESS_POLICY_CONFIGURATION_V0.1.md` | CERTIFIED | Policy Engine, presets, configuración | Charter, Domain | QA, UI, Backend, Providers | No tocar por ahora. |
@@ -91,10 +112,10 @@ AI_AGENT_RULES_AND_HANDOFF.md
 | `PROVIDER_RESEARCH_HIKVISION_V0.1.md` | CERTIFIED_FOR_RESEARCH | Hikvision ISAPI PBAC research | Domain, Cloud/Edge, Access Policy | Provider Strategy, QA | No tocar por ahora. |
 | `PROVIDER_ZKTECO_CVSECURITY_ADAPTER_SPEC_V0.1.md` | CERTIFIED_FOR_RESEARCH | ZKTeco/CVSecurity adapter spec | Domain, Cloud/Edge, Access Policy | ZKTeco Lab, Provider Strategy, QA | No tocar por ahora. |
 | `PROVIDER_ZKTECO_CVSECURITY_LAB_TEST_PLAN_V0.1.md` | REVIEW_REQUIRED | Laboratorio ZKTeco/CVSecurity | ZKTeco Adapter Spec | QA, Provider Strategy | No tocar hasta ejecutar laboratorio. |
-| `PROVIDER_STRATEGY_AND_CANONICAL_CONTRACTS_V0.1.md` | REVIEW_REQUIRED | Estrategia multivendor + contratos | Domain, Cloud/Edge, provider research | QA, Roadmap, AI Handoff | Actualizar primero después de este índice. |
-| `QA_HARNESS_SPEC_V0.1.md` | REVIEW_REQUIRED | Especificación del QA Harness | Charter, Domain, Policy, Cloud/Edge, Provider Strategy, Payment Research | Roadmap, AI Handoff | Actualizar después de Provider Strategy. |
-| `ROADMAP_V0.1.md` | REVIEW_REQUIRED | Roadmap de ejecución | Charter, Domain, Policy, Cloud/Edge, QA | AI Handoff | Actualizar después de QA. |
-| `AI_AGENT_RULES_AND_HANDOFF.md` | REVIEW_REQUIRED | Reglas para Claude Code CLI | Roadmap, QA, Provider Strategy | Claude Code CLI | Actualizar después de Roadmap. |
+| `PROVIDER_STRATEGY_AND_CANONICAL_CONTRACTS_V0.1.md` | CERTIFIED | Estrategia multivendor + contratos | Domain, Cloud/Edge, provider research | QA, Roadmap, AI Handoff | No tocar salvo contradicción de estado. |
+| `QA_HARNESS_SPEC_V0.1.md` | CERTIFIED | Especificación del QA Harness | Charter, Domain, Policy, Cloud/Edge, Provider Strategy, Payment Research | Roadmap, AI Handoff | No tocar salvo contradicción de estado. |
+| `ROADMAP_V0.1.md` | CERTIFIED | Roadmap de ejecución | Charter, Domain, Policy, Cloud/Edge, QA | AI Handoff | Mantener estado propio; estado global aquí. |
+| `AI_AGENT_RULES_AND_HANDOFF.md` | CERTIFIED | Reglas para Claude Code CLI | Roadmap, QA, Provider Strategy | Claude Code CLI | Mantener reglas estrictas; estado global aquí. |
 | `REPO_STRUCTURE_V0.1.md` | REVIEW_REQUIRED | Estructura objetivo del repo | Charter, Roadmap, AI Handoff | Bootstrap repo | Revisar cuando se decida estructura `/docs`. |
 | `USER_MANUAL_PLAN.md` | CERTIFIED | Plan de documentación de usuario | Charter, Roadmap | Manuales futuros | No tocar por ahora. |
 
@@ -135,7 +156,8 @@ Estado actual:
 
 ```text
 Mercado Pago research: CERTIFIED_FOR_RESEARCH
-QA/Roadmap/Handoff: REVIEW_REQUIRED
+QA Harness/Roadmap/AI Handoff/README: CERTIFIED
+Pago real: BLOCKED hasta sandbox/OAuth/webhooks validados
 ```
 
 ### 4.3 ZKTeco / CVSecurity
@@ -159,8 +181,9 @@ Estado actual:
 ```text
 Adapter spec: CERTIFIED_FOR_RESEARCH
 Lab test plan: REVIEW_REQUIRED hasta ejecución real
-Provider Strategy: REVIEW_REQUIRED
-QA Harness: REVIEW_REQUIRED
+Provider Strategy: CERTIFIED
+QA Harness: CERTIFIED
+Provider real: BLOCKED hasta laboratorio
 ```
 
 ### 4.4 Hikvision
@@ -181,8 +204,9 @@ Estado actual:
 
 ```text
 Hikvision research: CERTIFIED_FOR_RESEARCH
-Provider Strategy: REVIEW_REQUIRED
-QA Harness: REVIEW_REQUIRED
+Provider Strategy: CERTIFIED
+QA Harness: CERTIFIED
+Provider real: BLOCKED hasta laboratorio con dispositivo/controlador real
 ```
 
 ### 4.5 Handoff
@@ -203,9 +227,9 @@ Claude Code CLI
 
 ---
 
-## 5. Orden oficial de actualización
+## 5. Orden oficial de actualización documental
 
-Antes de entregar a Claude Code CLI, actualizar en este orden estricto:
+El cierre documental se consolidó en este orden:
 
 ```text
 1. DOCS_INDEX_AND_DEPENDENCY_MAP.md
@@ -239,24 +263,31 @@ USER_MANUAL_PLAN.md
 
 ## 7. Bloqueos actuales
 
-### 7.1 Handoff a Claude
+### 7.1 Handoff documental a Claude
+
+```text
+Estado: READY_FOR_BOOTSTRAP_REVIEW
+Alcance: revisión humana del bootstrap técnico.
+```
+
+Condiciones documentales resueltas:
+
+```text
+- Provider Strategy: CERTIFIED.
+- QA Harness: CERTIFIED.
+- Roadmap: CERTIFIED.
+- AI Handoff: CERTIFIED.
+- README: CERTIFIED.
+```
+
+### 7.2 Implementación productiva
 
 ```text
 Estado: BLOCKED
-Motivo: documentos dependientes todavía están en REVIEW_REQUIRED.
+Motivo: requiere bootstrap técnico aprobado, QA Harness implementado y labs reales.
 ```
 
-Bloqueadores mínimos:
-
-```text
-- Provider Strategy no absorbe completamente provider docs certificados.
-- QA Harness no absorbe endpoints reales y flujo de pagos actualizado.
-- Roadmap no refleja estado documental actual.
-- AI Handoff no enumera toda la fuente de verdad actual.
-- README no guía el uso del repo.
-```
-
-### 7.2 Implementación de providers
+### 7.3 Implementación de providers
 
 ```text
 ZKTeco/CVSecurity: BLOCKED hasta laboratorio.
@@ -268,9 +299,9 @@ Mercado Pago: BLOCKED hasta sandbox/OAuth/webhooks validados.
 
 ## 8. CONSISTENCY ISSUE registrados
 
-### CI-001 — Provider Strategy desactualizado frente a research certificado
+### CI-001 — RESOLVED — Provider Strategy desactualizado frente a research certificado
 
-`PROVIDER_STRATEGY_AND_CANONICAL_CONTRACTS_V0.1.md` debe actualizarse para consumir:
+`PROVIDER_STRATEGY_AND_CANONICAL_CONTRACTS_V0.1.md` quedó `CERTIFIED` consumiendo:
 
 ```text
 PROVIDER_RESEARCH_HIKVISION_V0.1.md
@@ -278,9 +309,9 @@ PROVIDER_ZKTECO_CVSECURITY_ADAPTER_SPEC_V0.1.md
 PAYMENT_PROVIDER_RESEARCH_MERCADO_PAGO_V0.1.md
 ```
 
-### CI-002 — QA Harness no refleja endpoints reales de providers
+### CI-002 — RESOLVED — QA Harness no refleja endpoints reales de providers
 
-`QA_HARNESS_SPEC_V0.1.md` debe incorporar suites específicas para:
+`QA_HARNESS_SPEC_V0.1.md` quedó `CERTIFIED` como especificación base para:
 
 ```text
 - ZKTeco/CVSecurity API 2025
@@ -288,13 +319,13 @@ PAYMENT_PROVIDER_RESEARCH_MERCADO_PAGO_V0.1.md
 - Mercado Pago Orders/Webhooks/Get Payment/Get Order
 ```
 
-### CI-003 — Roadmap no refleja estado documental actual
+### CI-003 — RESOLVED — Roadmap no refleja estado documental actual
 
-`ROADMAP_V0.1.md` debe actualizar fases de providers, pagos, QA y handoff.
+`ROADMAP_V0.1.md` quedó `CERTIFIED` y refleja fases de providers, pagos, QA y handoff.
 
-### CI-004 — AI Handoff no lista documentos nuevos críticos
+### CI-004 — RESOLVED — AI Handoff no lista documentos nuevos críticos
 
-`AI_AGENT_RULES_AND_HANDOFF.md` debe incluir como fuentes:
+`AI_AGENT_RULES_AND_HANDOFF.md` quedó `CERTIFIED` y remite el estado global a este índice. Sus fuentes incluyen:
 
 ```text
 PAYMENT_PROVIDER_RESEARCH_MERCADO_PAGO_V0.1.md
@@ -307,9 +338,9 @@ USER_MANUAL_PLAN.md
 DOCS_INDEX_AND_DEPENDENCY_MAP.md
 ```
 
-### CI-005 — README vacío
+### CI-005 — RESOLVED — README como puerta de entrada humana
 
-`README.md` debe convertirse en puerta de entrada del repositorio documental.
+`README.md` quedó `CERTIFIED` como puerta de entrada humana del repositorio documental.
 
 ### CI-006 — Estructura objetivo vs estructura actual
 
@@ -319,7 +350,7 @@ DOCS_INDEX_AND_DEPENDENCY_MAP.md
 
 ## 9. Orden oficial de lectura para humanos
 
-Mientras no se actualice AI Handoff, el orden recomendado para revisión humana es:
+El orden recomendado para revisión humana es:
 
 ```text
 1. PROJECT_CHARTER_TRICOR_HABITAT.md
@@ -340,9 +371,9 @@ Mientras no se actualice AI Handoff, el orden recomendado para revisión humana 
 
 ---
 
-## 10. Orden futuro de lectura para Claude Code CLI
+## 10. Orden oficial de lectura para Claude Code CLI
 
-Este orden será válido solo después de actualizar los documentos en `REVIEW_REQUIRED`:
+Este orden es válido para revisión de bootstrap técnico:
 
 ```text
 1. DOCS_INDEX_AND_DEPENDENCY_MAP.md
@@ -386,13 +417,13 @@ No actualizar documentos dependientes por inferencia.
 
 ```text
 Documento: DOCS_INDEX_AND_DEPENDENCY_MAP.md
-Estado: DRAFT
-Uso permitido: guía de auditoría y orden de actualización
-Uso no permitido: handoff final a Claude hasta actualizar dependientes
+Estado: CERTIFIED
+Uso permitido: fuente única del estado documental global, guía de auditoría y orden de lectura
+Uso no permitido: autorizar implementación productiva sin bootstrap técnico + QA Harness + labs
 ```
 
-Siguiente archivo recomendado:
+Siguiente fase recomendada:
 
 ```text
-PROVIDER_STRATEGY_AND_CANONICAL_CONTRACTS_V0.1.md
+revisión humana de bootstrap técnico
 ```

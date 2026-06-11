@@ -18,7 +18,7 @@
 Tarea: actualizar ROADMAP_V0.1.md
 Veredicto: MATCH
 Motivo: los documentos bloqueantes previos ya fueron consolidados en main:
-- DOCS_INDEX_AND_DEPENDENCY_MAP.md existe como índice maestro DRAFT.
+- DOCS_INDEX_AND_DEPENDENCY_MAP.md está CERTIFIED como índice maestro.
 - PROVIDER_STRATEGY_AND_CANONICAL_CONTRACTS_V0.1.md está CERTIFIED.
 - QA_HARNESS_SPEC_V0.1.md está CERTIFIED como especificación base.
 ```
@@ -74,7 +74,7 @@ AI_AGENT_RULES_AND_HANDOFF.md
 ```text
 Documento: CERTIFIED
 Uso permitido: planeación de ejecución, handoff posterior, control de orden y gates
-Uso no permitido: iniciar implementación sin AI_AGENT_RULES_AND_HANDOFF actualizado y sin bootstrap técnico aprobado
+Uso no permitido: iniciar implementación productiva sin bootstrap técnico aprobado, QA Harness y labs aplicables
 ```
 
 ---
@@ -138,6 +138,7 @@ No implementar proveedor real, pagos reales ni Edge productivo antes de contrato
 
 ```text
 PROJECT_CHARTER_TRICOR_HABITAT.md                  CERTIFIED
+DOCS_INDEX_AND_DEPENDENCY_MAP.md                   CERTIFIED
 DOMAIN_MODEL_V0.1.md                               CERTIFIED
 ACCESS_POLICY_CONFIGURATION_V0.1.md                CERTIFIED
 CLOUD_EDGE_ARCHITECTURE_V0.1.md                    CERTIFIED
@@ -146,25 +147,24 @@ PROVIDER_RESEARCH_HIKVISION_V0.1.md                CERTIFIED_FOR_RESEARCH
 PROVIDER_ZKTECO_CVSECURITY_ADAPTER_SPEC_V0.1.md    CERTIFIED_FOR_RESEARCH
 PROVIDER_STRATEGY_AND_CANONICAL_CONTRACTS_V0.1.md  CERTIFIED
 QA_HARNESS_SPEC_V0.1.md                            CERTIFIED
+ROADMAP_V0.1.md                                    CERTIFIED
+AI_AGENT_RULES_AND_HANDOFF.md                      CERTIFIED
+README.md                                          CERTIFIED
 USER_MANUAL_PLAN.md                                CERTIFIED
 ```
 
 ### 3.2 Documentos en revisión o bloqueados
 
 ```text
-DOCS_INDEX_AND_DEPENDENCY_MAP.md                   DRAFT
 PROVIDER_ZKTECO_CVSECURITY_LAB_TEST_PLAN_V0.1.md   REVIEW_REQUIRED hasta ejecución real
-ROADMAP_V0.1.md                                    CERTIFIED tras esta actualización
-AI_AGENT_RULES_AND_HANDOFF.md                      REVIEW_REQUIRED
 REPO_STRUCTURE_V0.1.md                             REVIEW_REQUIRED
-README.md                                          REVIEW_REQUIRED
 ```
 
 ### 3.3 Bloqueo principal actual
 
 ```text
-Handoff a Claude Code CLI: BLOCKED
-Motivo: falta actualizar AI_AGENT_RULES_AND_HANDOFF.md y README.md.
+Handoff documental a Claude Code CLI: READY_FOR_BOOTSTRAP_REVIEW
+Implementación productiva: BLOCKED hasta bootstrap técnico + QA Harness + labs
 ```
 
 ---
@@ -354,15 +354,15 @@ DOCS_INDEX_AND_DEPENDENCY_MAP.md actualizado
 PROVIDER_STRATEGY_AND_CANONICAL_CONTRACTS_V0.1.md CERTIFIED
 QA_HARNESS_SPEC_V0.1.md CERTIFIED
 ROADMAP_V0.1.md CERTIFIED
-AI_AGENT_RULES_AND_HANDOFF.md actualizado
-README.md actualizado
+AI_AGENT_RULES_AND_HANDOFF.md CERTIFIED
+README.md CERTIFIED
 ```
 
 Estado actual:
 
 ```text
-PASSED parcialmente
-BLOCKED por AI_AGENT_RULES_AND_HANDOFF.md y README.md
+READY_FOR_BOOTSTRAP_REVIEW
+No habilita implementación productiva.
 ```
 
 ### 9.2 Repo Bootstrap Gate
@@ -472,7 +472,7 @@ UserInfo/CardInfo/doorRight/RightPlan/RemoteControl/AcsEvent/QRCodeEvent probado
 
 **Objetivo:** dejar la documentación en estado coherente para handoff.
 
-**Estado actual:** en progreso.
+**Estado actual:** READY_FOR_BOOTSTRAP_REVIEW.
 
 **Entregables:**
 
@@ -485,19 +485,19 @@ PAYMENT_PROVIDER_RESEARCH_MERCADO_PAGO_V0.1.md     DONE
 PROVIDER_RESEARCH_HIKVISION_V0.1.md                DONE
 PROVIDER_ZKTECO_CVSECURITY_ADAPTER_SPEC_V0.1.md    DONE
 PROVIDER_ZKTECO_CVSECURITY_LAB_TEST_PLAN_V0.1.md   DONE / REVIEW_REQUIRED hasta ejecución
-DOCS_INDEX_AND_DEPENDENCY_MAP.md                   DONE / DRAFT
+DOCS_INDEX_AND_DEPENDENCY_MAP.md                   DONE / CERTIFIED
 PROVIDER_STRATEGY_AND_CANONICAL_CONTRACTS_V0.1.md  DONE / CERTIFIED
 QA_HARNESS_SPEC_V0.1.md                            DONE / CERTIFIED
-ROADMAP_V0.1.md                                    DONE tras esta actualización
-AI_AGENT_RULES_AND_HANDOFF.md                      PENDING UPDATE
-README.md                                          PENDING UPDATE
+ROADMAP_V0.1.md                                    DONE / CERTIFIED
+AI_AGENT_RULES_AND_HANDOFF.md                      DONE / CERTIFIED
+README.md                                          DONE / CERTIFIED
 ```
 
 **Criterio de terminado:**
 
 ```text
-AI_AGENT_RULES_AND_HANDOFF.md actualizado
-README.md actualizado
+AI_AGENT_RULES_AND_HANDOFF.md certificado
+README.md certificado
 orden de lectura claro
 hitos bloqueados claramente marcados
 ```
@@ -506,7 +506,7 @@ hitos bloqueados claramente marcados
 
 ```text
 iniciar código productivo
-entregar a Claude sin handoff actualizado
+tratar READY_FOR_BOOTSTRAP_REVIEW como permiso de implementación productiva
 implementar provider real
 ```
 
@@ -516,11 +516,13 @@ implementar provider real
 
 **Objetivo:** preparar el paquete final para Claude Code CLI.
 
+**Estado actual:** completada documentalmente; estado global ver `DOCS_INDEX_AND_DEPENDENCY_MAP.md`.
+
 **Entregables:**
 
 ```text
-AI_AGENT_RULES_AND_HANDOFF.md actualizado
-README.md actualizado
+AI_AGENT_RULES_AND_HANDOFF.md certificado
+README.md certificado
 orden oficial de lectura
 reglas de no implementación prematura
 reglas de un solo ejecutor
@@ -1134,9 +1136,8 @@ known limitations
 ## 11. Dependencias críticas
 
 ```text
-AI Handoff depende de Roadmap actualizado.
-Claude handoff depende de AI Handoff actualizado.
-Bootstrap repo depende de README + AI Handoff.
+Handoff documental: READY_FOR_BOOTSTRAP_REVIEW; estado global ver DOCS_INDEX_AND_DEPENDENCY_MAP.md.
+Bootstrap repo depende de revisión humana + README + AI Handoff certificados.
 QA Harness implementation depende de QA_HARNESS_SPEC certificado.
 Provider real depende de Provider Strategy + QA + lab.
 Mercado Pago real depende de sandbox/webhook/API confirmation.
@@ -1156,7 +1157,7 @@ Hikvision real depende de lab nuevo.
 | Mercado Pago restaura solo por webhook | Alto | Confirmación API obligatoria |
 | Edge decide negocio | Alto | Cloud decide, Edge ejecuta |
 | Configuración excesiva rompe flujo | Medio | presets + PolicyConfigValidator |
-| README vacío confunde repo | Medio | actualizar README después de AI Handoff |
+| README desactualizado confunde repo | Medio | README certificado como puerta de entrada humana |
 | Repo docs-only vs repo técnico no definido | Medio | resolver en REPO_STRUCTURE cuando toque |
 
 ---
@@ -1218,27 +1219,30 @@ no mezcla fondos
 
 ## 14. Próximo paso inmediato
 
-Actualizar un solo archivo:
+Ejecutar revisión humana del handoff documental:
 
 ```text
+DOCS_INDEX_AND_DEPENDENCY_MAP.md
+README.md
 AI_AGENT_RULES_AND_HANDOFF.md
+ROADMAP_V0.1.md
 ```
 
 Motivo:
 
 ```text
-Roadmap ya absorbe el estado actual.
-Ahora el handoff debe decirle a Claude exactamente qué leer, qué no tocar, qué está bloqueado y qué gates respetar.
+El cierre documental está en READY_FOR_BOOTSTRAP_REVIEW.
+La siguiente fase es bootstrap técnico controlado, no implementación productiva.
 ```
 
-No actualizar todavía:
+No iniciar todavía:
 
 ```text
-README.md
-REPO_STRUCTURE_V0.1.md
+provider real
+pagos reales
+Edge productivo
+apps/packages/monorepo sin tarea posterior aprobada
 ```
-
-README debe actualizarse después del AI Handoff.
 
 ---
 
@@ -1247,6 +1251,7 @@ README debe actualizarse después del AI Handoff.
 ```text
 Documento: ROADMAP_V0.1.md
 Estado: CERTIFIED
-Implementación: BLOCKED hasta AI Handoff + README + bootstrap técnico
-Siguiente documento: AI_AGENT_RULES_AND_HANDOFF.md
+Handoff documental: READY_FOR_BOOTSTRAP_REVIEW
+Implementación productiva: BLOCKED hasta bootstrap técnico + QA Harness + labs
+Siguiente fase: revisión humana de bootstrap técnico
 ```

@@ -4,7 +4,7 @@
 **Versión del documento:** v0.1  
 **Estado documental:** CERTIFIED como reglas base de trabajo con agentes IA  
 **Estado de implementación:** BLOCKED hasta bootstrap técnico del repo  
-**Estado de handoff a Claude Code CLI:** BLOCKED hasta actualizar `README.md` y confirmar estructura documental final  
+**Estado de handoff a Claude Code CLI:** ver `DOCS_INDEX_AND_DEPENDENCY_MAP.md`
 **Fecha:** 2026-06-11  
 **Archivo autoritativo:** `AI_AGENT_RULES_AND_HANDOFF.md`  
 **Modo de actualización:** actualización controlada del mismo archivo, sin crear duplicados  
@@ -79,7 +79,7 @@ USER_MANUAL_PLAN.md
 ```text
 Documento: CERTIFIED
 Uso permitido: reglas de trabajo, handoff, prompts para Claude Code CLI, control de alcance, QA gates
-Uso no permitido: iniciar implementación productiva sin bootstrap técnico y sin README actualizado
+Uso no permitido: iniciar implementación productiva sin bootstrap técnico aprobado, QA Harness y labs aplicables
 ```
 
 ---
@@ -150,17 +150,12 @@ Si falta una decisión, el agente debe marcarla como pendiente. No debe resolver
 
 ---
 
-## 3. Estado actual del handoff
+## 3. Estado propio y handoff
 
-### 3.1 Estado del paquete documental
+### 3.1 Estado propio del documento
 
 ```text
-Documentación base: mayormente consolidada.
-Provider Strategy: CERTIFIED.
-QA Harness Spec: CERTIFIED.
-Roadmap: CERTIFIED.
-AI Agent Rules: CERTIFIED tras esta actualización.
-README: REVIEW_REQUIRED.
+AI_AGENT_RULES_AND_HANDOFF.md: CERTIFIED.
 Repo técnico: no iniciado.
 Implementación: no iniciada.
 ```
@@ -168,17 +163,10 @@ Implementación: no iniciada.
 ### 3.2 Estado de handoff a Claude Code CLI
 
 ```text
-Handoff a Claude Code CLI: BLOCKED
-Motivo: falta actualizar README.md como puerta de entrada del repositorio.
+Estado global del handoff: ver DOCS_INDEX_AND_DEPENDENCY_MAP.md.
 ```
 
-Después de actualizar `README.md`, el handoff puede cambiar a:
-
-```text
-READY_FOR_BOOTSTRAP_REVIEW
-```
-
-No debe pasar directo a implementación productiva.
+El handoff documental no debe pasar directo a implementación productiva.
 
 ---
 
@@ -225,7 +213,7 @@ Claude debe leer en este orden:
 16. USER_MANUAL_PLAN.md
 ```
 
-Mientras `README.md` no esté actualizado, Claude debe iniciar por:
+Para estado global vigente, Claude debe consultar:
 
 ```text
 DOCS_INDEX_AND_DEPENDENCY_MAP.md
@@ -259,25 +247,12 @@ DRAFT = guía provisional.
 
 ---
 
-## 7. Estado actual por documento
+## 7. Estado documental global
 
 ```text
-DOCS_INDEX_AND_DEPENDENCY_MAP.md                   DRAFT
-PROJECT_CHARTER_TRICOR_HABITAT.md                  CERTIFIED
-DOMAIN_MODEL_V0.1.md                               CERTIFIED
-ACCESS_POLICY_CONFIGURATION_V0.1.md                CERTIFIED
-CLOUD_EDGE_ARCHITECTURE_V0.1.md                    CERTIFIED
-PAYMENT_PROVIDER_RESEARCH_MERCADO_PAGO_V0.1.md     CERTIFIED_FOR_RESEARCH
-PROVIDER_RESEARCH_HIKVISION_V0.1.md                CERTIFIED_FOR_RESEARCH
-PROVIDER_ZKTECO_CVSECURITY_ADAPTER_SPEC_V0.1.md    CERTIFIED_FOR_RESEARCH
-PROVIDER_ZKTECO_CVSECURITY_LAB_TEST_PLAN_V0.1.md   REVIEW_REQUIRED hasta ejecución de laboratorio
-PROVIDER_STRATEGY_AND_CANONICAL_CONTRACTS_V0.1.md  CERTIFIED
-QA_HARNESS_SPEC_V0.1.md                            CERTIFIED
-ROADMAP_V0.1.md                                    CERTIFIED
-AI_AGENT_RULES_AND_HANDOFF.md                      CERTIFIED tras esta actualización
-REPO_STRUCTURE_V0.1.md                             REVIEW_REQUIRED
-USER_MANUAL_PLAN.md                                CERTIFIED
-README.md                                          REVIEW_REQUIRED
+Este documento solo declara su estado propio.
+Para el estado documental global, ver DOCS_INDEX_AND_DEPENDENCY_MAP.md.
+AI_AGENT_RULES_AND_HANDOFF.md: CERTIFIED
 ```
 
 ---
@@ -840,7 +815,7 @@ README.md
 Estado tras este documento:
 
 ```text
-BLOCKED por README.md
+Estado global del Documentation Gate: ver DOCS_INDEX_AND_DEPENDENCY_MAP.md.
 ```
 
 ### 23.2 Repo Bootstrap Gate
@@ -1302,9 +1277,9 @@ PASS / REVIEW_REQUIRED / BLOCKED
 
 ---
 
-## 35. Primeras tareas permitidas después de README
+## 35. Primeras tareas permitidas después del cierre documental
 
-Después de actualizar `README.md`, las primeras tareas permitidas son:
+Después de revisión humana del handoff documental, las primeras tareas permitidas son:
 
 ```text
 1. decidir estructura docs-only temporal vs mover a /docs
@@ -1333,14 +1308,14 @@ integraciones futuras
 
 ```text
 AI_AGENT_RULES_AND_HANDOFF.md: CERTIFIED
-Handoff a Claude Code CLI: BLOCKED hasta README.md actualizado
-Implementación: BLOCKED hasta bootstrap técnico
+Handoff a Claude Code CLI: ver DOCS_INDEX_AND_DEPENDENCY_MAP.md
+Implementación productiva: BLOCKED hasta bootstrap técnico + QA Harness + labs
 Provider real: BLOCKED hasta QA + laboratorio
 Pago real: BLOCKED hasta sandbox/webhooks/OAuth validado
 ```
 
-Siguiente archivo recomendado:
+Siguiente fase recomendada:
 
 ```text
-README.md
+revisión humana de bootstrap técnico
 ```

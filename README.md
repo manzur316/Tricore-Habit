@@ -2,7 +2,7 @@
 
 **Estado del repositorio:** documentación y arquitectura v0.1  
 **Estado de implementación:** no iniciar código productivo todavía  
-**Objetivo:** preparar una base documental coherente para handoff posterior a Claude Code CLI  
+**Objetivo:** servir como puerta de entrada humana para el handoff documental a Claude Code CLI
 **Fuente operativa:** este repositorio, rama `main`
 
 ---
@@ -39,10 +39,11 @@ QA Harness CLI: pendiente
 Backend Cloud: pendiente
 Edge Agent: pendiente
 Provider adapters: pendientes
-Handoff a Claude Code CLI: pendiente de cierre documental
+Handoff a Claude Code CLI: READY_FOR_BOOTSTRAP_REVIEW
+Implementación productiva: BLOCKED hasta bootstrap técnico + QA Harness + labs
 ```
 
-Este repositorio **no debe tratarse todavía como repo de implementación**. Es la fuente documental previa al bootstrap técnico.
+Este repositorio **no debe tratarse todavía como repo de implementación productiva**. El siguiente paso es la revisión humana del bootstrap técnico.
 
 ---
 
@@ -90,7 +91,7 @@ Si existe contradicción entre documentos, detener implementación y reportar `C
 
 | Documento | Estado | Función |
 |---|---:|---|
-| `DOCS_INDEX_AND_DEPENDENCY_MAP.md` | DRAFT | Índice maestro y mapa de dependencias. |
+| `DOCS_INDEX_AND_DEPENDENCY_MAP.md` | CERTIFIED | Fuente única del estado documental global. |
 | `PROJECT_CHARTER_TRICOR_HABITAT.md` | CERTIFIED | Visión, alcance, no-goals y producto. |
 | `DOMAIN_MODEL_V0.1.md` | CERTIFIED | Modelo de dominio y entidades principales. |
 | `ACCESS_POLICY_CONFIGURATION_V0.1.md` | CERTIFIED | Policy Engine, presets, configuración y permisos. |
@@ -110,7 +111,21 @@ Si existe contradicción entre documentos, detener implementación y reportar `C
 
 ## 6. Handoff a Claude Code CLI
 
-El handoff solo debe ocurrir después de confirmar que estos documentos están presentes y actualizados:
+Estado del handoff documental:
+
+```text
+READY_FOR_BOOTSTRAP_REVIEW
+```
+
+El estado documental global se consulta en:
+
+```text
+DOCS_INDEX_AND_DEPENDENCY_MAP.md
+```
+
+Esto habilita revisión de bootstrap técnico. No habilita implementación productiva, provider real, Edge productivo ni pagos reales.
+
+Para revisión de bootstrap, confirmar que estos documentos están presentes y actualizados:
 
 ```text
 DOCS_INDEX_AND_DEPENDENCY_MAP.md
@@ -131,7 +146,7 @@ Claude Code CLI debe leer primero:
 AI_AGENT_RULES_AND_HANDOFF.md
 ```
 
-Ningún agente debe implementar código crítico sin QA Harness, provider contracts y reporte de trabajo.
+Ningún agente debe implementar código crítico sin bootstrap técnico aprobado, QA Harness, provider contracts y reporte de trabajo.
 
 ---
 
@@ -307,14 +322,14 @@ No hacer todavía:
 Después de este cierre documental:
 
 ```text
-1. Confirmar que README.md fue subido a main.
-2. Auditar repo final una vez más.
+1. Revisión humana del handoff documental.
+2. Auditar repo final una vez más contra DOCS_INDEX_AND_DEPENDENCY_MAP.md.
 3. Decidir si se mantiene docs en raíz o se migra a /docs.
-4. Crear CLAUDE.md.
-5. Iniciar bootstrap técnico del monorepo.
+4. Preparar bootstrap técnico en una tarea posterior aprobada.
+5. Crear estructura técnica solo después de aprobación humana explícita.
 ```
 
-No iniciar implementación sin confirmar el handoff documental.
+No iniciar implementación productiva desde este README. El cierre documental no significa implementar providers reales ni pagos reales todavía.
 
 ---
 
@@ -351,5 +366,5 @@ MERCADO_PAGO_ACCESS_TOKEN=<SANDBOX_ACCESS_TOKEN>
 Documento: README.md
 Estado: CERTIFIED como puerta de entrada documental
 Uso permitido: navegación humana, handoff documental, auditoría inicial
-Uso no permitido: sustituir documentos técnicos fuente
+Uso no permitido: sustituir documentos técnicos fuente o el estado global de DOCS_INDEX_AND_DEPENDENCY_MAP.md
 ```
