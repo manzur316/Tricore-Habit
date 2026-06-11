@@ -79,8 +79,9 @@ Leer en este orden:
 11. PROVIDER_RESEARCH_HIKVISION_V0.1.md
 12. QA_HARNESS_SPEC_V0.1.md
 13. ROADMAP_V0.1.md
-14. REPO_STRUCTURE_V0.1.md
-15. USER_MANUAL_PLAN.md
+14. ADVANCED_IMPLEMENTATION_GUARDRAILS_V0.1.md
+15. REPO_STRUCTURE_V0.1.md
+16. USER_MANUAL_PLAN.md
 ```
 
 Si existe contradicción entre documentos, detener implementación y reportar `CONSISTENCY ISSUE`.
@@ -104,6 +105,7 @@ Si existe contradicción entre documentos, detener implementación y reportar `C
 | `QA_HARNESS_SPEC_V0.1.md` | CERTIFIED | Especificación del QA Harness. |
 | `ROADMAP_V0.1.md` | CERTIFIED | Roadmap actualizado. |
 | `AI_AGENT_RULES_AND_HANDOFF.md` | CERTIFIED | Reglas para Claude Code CLI y agentes IA. |
+| `ADVANCED_IMPLEMENTATION_GUARDRAILS_V0.1.md` | CERTIFIED | Guardrails avanzados de implementación. |
 | `REPO_STRUCTURE_V0.1.md` | REVIEW_REQUIRED | Estructura objetivo del monorepo. |
 | `USER_MANUAL_PLAN.md` | CERTIFIED | Plan de manuales de usuario. |
 

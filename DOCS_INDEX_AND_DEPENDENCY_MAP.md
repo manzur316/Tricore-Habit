@@ -116,6 +116,7 @@ BLOCKED hasta bootstrap técnico + QA Harness + labs.
 | `QA_HARNESS_SPEC_V0.1.md` | CERTIFIED | Especificación del QA Harness | Charter, Domain, Policy, Cloud/Edge, Provider Strategy, Payment Research | Roadmap, AI Handoff | No tocar salvo contradicción de estado. |
 | `ROADMAP_V0.1.md` | CERTIFIED | Roadmap de ejecución | Charter, Domain, Policy, Cloud/Edge, QA | AI Handoff | Mantener estado propio; estado global aquí. |
 | `AI_AGENT_RULES_AND_HANDOFF.md` | CERTIFIED | Reglas para Claude Code CLI | Roadmap, QA, Provider Strategy | Claude Code CLI | Mantener reglas estrictas; estado global aquí. |
+| `ADVANCED_IMPLEMENTATION_GUARDRAILS_V0.1.md` | CERTIFIED | Guardrails avanzados de implementación | Roadmap, AI Handoff, QA | Bootstrap técnico, ejecución controlada | No tocar salvo contradicción de estado. |
 | `REPO_STRUCTURE_V0.1.md` | REVIEW_REQUIRED | Estructura objetivo del repo | Charter, Roadmap, AI Handoff | Bootstrap repo | Revisar cuando se decida estructura `/docs`. |
 | `USER_MANUAL_PLAN.md` | CERTIFIED | Plan de documentación de usuario | Charter, Roadmap | Manuales futuros | No tocar por ahora. |
 
@@ -237,7 +238,8 @@ El cierre documental se consolidó en este orden:
 3. QA_HARNESS_SPEC_V0.1.md
 4. ROADMAP_V0.1.md
 5. AI_AGENT_RULES_AND_HANDOFF.md
-6. README.md
+6. ADVANCED_IMPLEMENTATION_GUARDRAILS_V0.1.md
+7. README.md
 ```
 
 `REPO_STRUCTURE_V0.1.md` se actualiza solo si se decide mover documentos a `/docs/...` o formalizar la estructura docs-only temporal.
