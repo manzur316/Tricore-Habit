@@ -2,52 +2,117 @@
 
 **Proyecto:** Tricor Hábitat  
 **Versión del documento:** v0.1  
-**Estado:** Draft formal inicial / fuente de verdad provisional para estrategia de proveedores y contratos canónicos  
-**Fecha:** 2026-06-10  
-**Documentos padre:**  
-- `PROJECT_CHARTER_TRICOR_HABITAT.md`
-- `DOMAIN_MODEL_V0.1.md`
-- `ACCESS_POLICY_CONFIGURATION_V0.1.md`
-- `CLOUD_EDGE_ARCHITECTURE_V0.1.md`
-- `QA_HARNESS_SPEC_V0.1.md`
-- `ROADMAP_V0.1.md`
-- `REPO_STRUCTURE_V0.1.md`
-- `PROVIDER_RESEARCH_HIKVISION_V0.1.md`
-
-**Preparado para:** arquitectura, backend, Edge, provider adapters, QA Harness, Tricor Condo, Tricor Platform, documentación histórica y handoff posterior a Claude Code CLI  
-**Idioma base:** Español  
+**Estado documental:** CERTIFIED como estrategia base de proveedores y contratos canónicos  
+**Estado de implementación:** BLOCKED para proveedores reales hasta QA Harness + laboratorio  
+**Fecha:** 2026-06-11  
+**Archivo autoritativo:** `PROVIDER_STRATEGY_AND_CANONICAL_CONTRACTS_V0.1.md`  
+**Modo de actualización:** actualización controlada del mismo archivo, sin crear duplicados  
 
 ---
 
-## 1. Propósito del documento
+## 0. Control de auditoría
 
-Este documento define la estrategia oficial de integración con proveedores de control de acceso para Tricor Hábitat y los contratos canónicos que deben proteger el dominio del producto.
+### 0.1 Veredicto de la tarea
 
-Su objetivo es evitar que Tricor Hábitat vuelva a depender de estructuras internas, nombres, rutas, permisos o payloads específicos de un proveedor.
+```text
+Tarea: actualizar Provider Strategy and Canonical Contracts
+Veredicto: MATCH
+Motivo: existen documentos base suficientes y certificados/revisados para consolidar estrategia de proveedores:
+- dominio canónico de Tricor
+- arquitectura Cloud + Edge
+- configuración/policy engine
+- provider ZKTeco / CVSecurity basado en PDF 2025
+- provider Hikvision ISAPI PBAC basado en PDF Person-Based Access Control
+- Mercado Pago como proveedor de pagos documentado por separado
+```
 
-La regla central es:
+### 0.2 Archivo actualizado
+
+```text
+Archivo objetivo: PROVIDER_STRATEGY_AND_CANONICAL_CONTRACTS_V0.1.md
+Archivos modificados en esta tarea: solo este archivo
+```
+
+### 0.3 Archivos no tocados
+
+```text
+PROJECT_CHARTER_TRICOR_HABITAT.md
+DOMAIN_MODEL_V0.1.md
+ACCESS_POLICY_CONFIGURATION_V0.1.md
+CLOUD_EDGE_ARCHITECTURE_V0.1.md
+PAYMENT_PROVIDER_RESEARCH_MERCADO_PAGO_V0.1.md
+PROVIDER_RESEARCH_HIKVISION_V0.1.md
+PROVIDER_ZKTECO_CVSECURITY_ADAPTER_SPEC_V0.1.md
+PROVIDER_ZKTECO_CVSECURITY_LAB_TEST_PLAN_V0.1.md
+QA_HARNESS_SPEC_V0.1.md
+ROADMAP_V0.1.md
+AI_AGENT_RULES_AND_HANDOFF.md
+REPO_STRUCTURE_V0.1.md
+USER_MANUAL_PLAN.md
+README.md
+```
+
+### 0.4 Documentos fuente utilizados
+
+Este documento consolida decisiones ya asentadas en el repositorio:
+
+```text
+PROJECT_CHARTER_TRICOR_HABITAT.md
+DOMAIN_MODEL_V0.1.md
+ACCESS_POLICY_CONFIGURATION_V0.1.md
+CLOUD_EDGE_ARCHITECTURE_V0.1.md
+PAYMENT_PROVIDER_RESEARCH_MERCADO_PAGO_V0.1.md
+PROVIDER_RESEARCH_HIKVISION_V0.1.md
+PROVIDER_ZKTECO_CVSECURITY_ADAPTER_SPEC_V0.1.md
+PROVIDER_ZKTECO_CVSECURITY_LAB_TEST_PLAN_V0.1.md
+DOCS_INDEX_AND_DEPENDENCY_MAP.md
+```
+
+### 0.5 Estado del documento
+
+```text
+Documento: CERTIFIED
+Uso permitido: arquitectura, contratos canónicos, diseño de provider-sdk, diseño de Edge, diseño de QA Harness
+Uso no permitido: implementación productiva de providers sin pruebas de laboratorio
+```
+
+---
+
+## 1. Propósito
+
+Este documento define la estrategia oficial de integración con proveedores externos para **Tricor Hábitat** y los contratos canónicos que deben proteger el dominio del producto.
+
+Su propósito principal es evitar que Tricor vuelva a depender de estructuras internas, rutas, nombres, permisos o payloads específicos de un proveedor.
+
+La regla central:
 
 ```text
 Tricor Hábitat define el dominio.
-El proveedor ejecuta capacidades externas.
-El adapter traduce entre ambos mundos.
+El proveedor expone capacidades externas.
+El adapter traduce.
+El QA Harness valida.
+El laboratorio confirma.
 ```
 
-Este documento debe servir como fuente de verdad para:
+Este documento aplica a:
 
 ```text
-- diseño de provider adapters
+- proveedores de control de acceso
+- provider adapters
 - ProviderCapabilityMatrix
 - ProviderInstallation
 - ProviderMapping
-- provider contracts
-- QA Harness
+- ProviderExternalRef
+- AccessCommand
+- DesiredAccessState
+- ObservedAccessState
 - Edge
-- Policy Engine
+- QA Harness
 - Tricor Condo → Configuración → Proveedor
-- Tricor Platform → soporte técnico y monitoreo
-- handoff a Claude Code CLI
+- Tricor Platform → soporte/monitoreo
 ```
+
+Este documento **no** define implementación fiscal, contable, UI final ni código productivo.
 
 ---
 
@@ -73,147 +138,245 @@ Incidente
 Auditoría
 ```
 
-El proveedor puede hablar en otros términos:
+Los proveedores pueden hablar en términos propios:
 
 ```text
-persona externa
-tarjeta externa
-nivel de acceso externo
-puerta externa
-grupo externo
-device externo
-evento externo
-endpoint externo
-payload externo
+ZKTeco: pin, cardNo, accLevelIds, doorId, psgGateId, transaction
+Hikvision: employeeNo, cardNo, doorRight, RightPlan, door ID, AcsEvent, QRCodeEvent
+Mercado Pago: order, payment, webhook, access_token, x-signature
 ```
 
 Pero esos términos solo pueden existir en:
 
 ```text
-- provider adapters
-- ProviderMapping
-- ProviderExternalRef
-- ProviderCapabilityMatrix
-- provider-specific tests
-- Edge connector
+provider adapters
+payment provider adapters
+ProviderMapping
+ProviderExternalRef
+ProviderCapabilityMatrix
+provider-specific QA tests
+Edge connector
+technical documentation
 ```
 
 No deben contaminar:
 
 ```text
-- packages/domain
-- políticas de negocio
-- modelos principales de Tricor
-- UI de usuario normal
-- reglas de morosidad
-- reglas de pagos
+packages/domain
+Policy Engine
+reglas de morosidad
+reglas de pagos
+modelos principales de Tricor
+UI normal de Condo/Guard/Resident
 ```
 
 ---
 
-## 3. Decisión estratégica v0.1
+## 3. Alcance de este documento
 
-### 3.1 Proveedor implementado en v1
-
-El primer proveedor operativo de acceso será:
+### 3.1 En alcance
 
 ```text
-ZKTeco / CVSecurity
+- Estrategia provider-neutral de control de acceso.
+- Contratos canónicos para AccessProviderAdapter.
+- ProviderCapabilityMatrix.
+- ProviderInstallation.
+- ProviderMapping.
+- ProviderExternalRef.
+- Estrategia ZKTeco / CVSecurity.
+- Estrategia Hikvision ISAPI Person-Based Access Control.
+- Relación con Mercado Pago como proveedor de pagos, sin mezclarlo con access providers.
+- Reglas de Edge.
+- Reglas de QA/laboratorio.
+- Reglas para futuros proveedores.
 ```
 
-Decisión:
+### 3.2 Fuera de alcance
 
 ```text
-Estado: v1 implementation target
-Modo esperado: Edge obligatorio
-Prioridad: alta
+- Implementación productiva.
+- Código final.
+- UI final.
+- Facturación fiscal propia.
+- Contabilidad completa.
+- Integraciones no aprobadas.
+- Automatizaciones externas como core.
+- Pruebas de hardware ejecutadas.
+```
+
+---
+
+## 4. Clasificación de proveedores
+
+Tricor maneja dos familias distintas de proveedores.
+
+### 4.1 Access Providers
+
+Controlan accesos físicos o permisos de acceso.
+
+```text
+ZKTeco / ZKBio CVSecurity
+Hikvision ISAPI Person-Based Access Control
+Generic Mock Provider
+```
+
+Estos providers usan:
+
+```text
+AccessProviderAdapter
+ProviderCapabilityMatrix
+ProviderMapping
+ProviderExternalRef
+AccessCommand
+DesiredAccessState
+ObservedAccessState
+Edge
+```
+
+### 4.2 Payment Providers
+
+Procesan pagos y confirman dinero.
+
+```text
+Mercado Pago
+Stripe futuro
+Manual transfer fallback
+```
+
+Estos providers usan:
+
+```text
+PaymentProviderInstallation
+PaymentOrder
+PaymentAttempt
+PaymentProviderEvent
+PaymentReconciliationRecord
+PaymentProviderAdapter
+```
+
+Regla importante:
+
+```text
+Mercado Pago no es un AccessProvider.
+Mercado Pago no aplica permisos.
+Mercado Pago solo confirma pagos.
+Tricor recalcula acceso.
+Edge/proveedor de acceso aplica el resultado.
+```
+
+---
+
+## 5. Decisión estratégica v0.1
+
+### 5.1 Access provider implementado primero
+
+```text
+Provider: ZKTeco / ZKBio CVSecurity
+ProviderKey: ZKTECO_CVSECURITY
+Estado documental: CERTIFIED
+Implementación: BLOCKED hasta laboratorio
+Modo esperado: EDGE_LOCAL
+Prioridad: MVP v1
 ```
 
 Razón:
 
 ```text
-Es el primer proveedor conocido por el proyecto y se considera el objetivo inicial para validar el flujo real:
-pagos → morosidad → perfil de acceso → Edge → proveedor → estado observado.
+ZKTeco / CVSecurity es el primer proveedor conocido, con manual 2025 disponible y laboratorio local definido.
+Debe validar el flujo central: pagos → morosidad → perfil de acceso → Edge → proveedor → estado observado.
 ```
 
-### 3.2 Proveedor en investigación prioritaria
-
-Proveedor:
+### 5.2 Access provider en research certificado
 
 ```text
-Hikvision / Hik-Connect / ISAPI / HikCentral Professional OpenAPI
+Provider: Hikvision ISAPI Person-Based Access Control
+ProviderKey: HIKVISION_ISAPI_PBAC
+Estado documental: CERTIFIED como research base
+Implementación: BLOCKED hasta laboratorio con dispositivo/controlador real
+Modo esperado: EDGE_LOCAL salvo prueba contraria
+Prioridad: alta, no bloquea MVP ZKTeco
 ```
 
-Decisión:
+Razón:
 
 ```text
-Estado: research track
-Modo esperado: por definir con laboratorio
-Prioridad: alta, pero no bloquea MVP
+El PDF Intelligent Security API (Person-Based Access Control) documenta endpoints reales de personas, tarjetas, permisos, puerta remota, eventos, QR events y remote check.
 ```
 
-Hikvision no debe implementarse en producción hasta cerrar:
+### 5.3 Payment provider prioritario
 
 ```text
-- superficie oficial de integración
-- capacidad real de permisos
-- capacidad real de puerta remota
-- capacidad real de eventos
-- capacidad real de personas/credenciales
-- necesidad o no de Edge
-- QA Harness provider contract
-- hardware/sandbox de laboratorio
+Provider: Mercado Pago
+PaymentProviderKey: MERCADO_PAGO
+Estado documental: CERTIFIED_FOR_RESEARCH
+Implementación: BLOCKED hasta sandbox, OAuth/cuenta conectada y webhooks reales
+Prioridad: alta para pagos v1
 ```
 
-### 3.3 Proveedores futuros
-
-Otros proveedores solo pueden entrar después de que el contrato canónico esté probado con el primer proveedor real.
-
-No se permite agregar proveedores por atajos específicos.
-
-Regla:
+Razón:
 
 ```text
-Nuevo proveedor = nueva ProviderCapabilityMatrix + nuevo adapter + nuevos provider contract tests.
+Tricor necesita confirmar pagos por API/webhook para restaurar acceso automáticamente.
+Cada condominio debe conectar su propia cuenta de cobro.
+Tricor no custodia dinero de mantenimiento.
+```
+
+### 5.4 Generic Mock Provider
+
+```text
+Provider: Generic Mock
+ProviderKey: GENERIC_MOCK
+Estado: REQUIRED_FOR_QA
+Modo: local/test
+```
+
+Razón:
+
+```text
+El QA Harness debe validar dominio, policy engine, access commands y Edge sin depender de hardware real.
 ```
 
 ---
 
-## 4. Qué problema resuelve esta estrategia
+## 6. ProviderKey canónico
 
-Sin esta estrategia, cada proveedor puede empujar al sistema a hablar su propio idioma.
-
-Eso causaría:
-
-```text
-- lógica duplicada por proveedor
-- reglas de morosidad diferentes por proveedor
-- UI llena de nombres técnicos externos
-- permisos incompatibles
-- mapeos frágiles
-- comandos no auditables
-- testing imposible
-- dependencia excesiva de un proveedor
-- parches acumulados
+```ts
+type AccessProviderKey =
+  | 'ZKTECO_CVSECURITY'
+  | 'HIKVISION_ISAPI_PBAC'
+  | 'GENERIC_MOCK';
 ```
 
-Con contratos canónicos, Tricor puede decir:
+No usar:
 
 ```text
-Propiedad A-101 está morosa.
-Aplicar perfil MOROSO_DEFAULT_PROFILE.
-Bloquear vehicular.
-Bloquear QR invitados.
-Conservar peatonal.
+HIKVISION_RESEARCH como provider productivo.
+ZK como alias en dominio.
+CVSecurity endpoint names en dominio.
+Hikvision endpoint names en dominio.
+Mercado Pago como AccessProviderKey.
 ```
 
-Y cada adapter decide cómo traducirlo.
+Reglas:
+
+```text
+- AccessProviderKey puede vivir en provider adapters, ProviderInstallation y QA Harness.
+- AccessProviderKey no debe ramificar reglas de dominio.
+- PaymentProviderKey vive en pagos, no en access provider contracts.
+```
+
+Payment provider key separado:
+
+```ts
+type PaymentProviderKey =
+  | 'MERCADO_PAGO'
+  | 'STRIPE_FUTURE'
+  | 'MANUAL_TRANSFER';
+```
 
 ---
 
-## 5. Modelo de capas
-
-Arquitectura oficial:
+## 7. Modelo de capas
 
 ```text
 Tricor Domain
@@ -222,16 +385,16 @@ Policy Engine
     ↓
 Access Orchestration
     ↓
-Provider Contract
+Access Provider Contract
     ↓
 Provider Adapter
     ↓
-Edge Connector / Cloud Connector
+Edge Connector
     ↓
 Proveedor externo
 ```
 
-### 5.1 Tricor Domain
+### 7.1 Tricor Domain
 
 Responsable de:
 
@@ -239,18 +402,18 @@ Responsable de:
 - propiedad
 - morosidad
 - pagos
-- credenciales
+- credenciales canónicas
 - perfiles canónicos
 - zonas canónicas
 - estados deseados
 - auditoría
 ```
 
-No sabe cómo se llama una puerta en el proveedor.
+No conoce endpoints, tokens ni IDs técnicos de proveedor.
 
-### 5.2 Policy Engine
+### 7.2 Policy Engine
 
-Responsable de calcular:
+Calcula:
 
 ```text
 PropertyStatus
@@ -262,99 +425,85 @@ PropertyStatus
 = DesiredAccessState
 ```
 
-### 5.3 Access Orchestration
+### 7.3 Access Orchestration
 
-Responsable de convertir estados deseados en comandos:
+Convierte estado deseado en comandos:
 
 ```text
 DesiredAccessState
 → AccessCommand[]
 ```
 
-### 5.4 Provider Contract
+### 7.4 Access Provider Contract
 
 Define operaciones canónicas mínimas:
 
 ```text
-- validar instalación
-- listar capacidades
-- validar mappings
-- aplicar perfil de acceso
-- revocar credencial
-- restaurar credencial
-- abrir puerta remotamente, si está soportado
-- leer estado observado
-- reconciliar datos
+validateInstallation
+getCapabilities
+validateMappings
+applyAccessProfile
+revokeCredential
+restoreCredential
+disableCredential
+openDoor
+fetchObservedState
+reconcile
 ```
 
-### 5.5 Provider Adapter
+### 7.5 Provider Adapter
 
-Traduce contratos canónicos a proveedor específico.
+Traduce contratos canónicos a endpoints de proveedor.
 
 No decide reglas de negocio.
 
-### 5.6 Edge Connector / Cloud Connector
+### 7.6 Edge Connector
 
-Ejecuta la comunicación técnica:
+Ejecuta técnicamente el acceso local:
 
 ```text
 HTTP local
-API externa
-SDK
-servicio local
-protocolo específico
+HTTPS local
+Digest/Basic auth
+access_token query
+SDK/protocolo específico futuro
 ```
-
-El tipo de conector depende del proveedor y de la instalación.
 
 ---
 
-## 6. Contrato canónico mínimo de proveedor
-
-Todo proveedor debe implementar una interfaz conceptual.
+## 8. Contrato canónico mínimo de Access Provider
 
 ```ts
 type AccessProviderAdapter = {
-  providerKey: ProviderKey;
+  providerKey: AccessProviderKey;
+
   validateInstallation(input: ValidateInstallationInput): Promise<ValidationResult>;
   getCapabilities(input: GetCapabilitiesInput): Promise<ProviderCapabilityMatrix>;
   validateMappings(input: ValidateMappingsInput): Promise<MappingValidationResult>;
+
   applyAccessProfile(input: ApplyAccessProfileInput): Promise<ProviderOperationResult>;
   revokeCredential(input: RevokeCredentialInput): Promise<ProviderOperationResult>;
   restoreCredential(input: RestoreCredentialInput): Promise<ProviderOperationResult>;
   disableCredential(input: DisableCredentialInput): Promise<ProviderOperationResult>;
+
   openDoor(input: OpenDoorInput): Promise<ProviderOperationResult>;
+
   fetchObservedState(input: FetchObservedStateInput): Promise<ObservedAccessStateResult>;
   reconcile(input: ReconcileProviderInput): Promise<ReconciliationResult>;
 };
 ```
 
-No todos los métodos están disponibles para todos los proveedores.
+No todos los proveedores soportan todos los métodos. Por eso la matriz de capacidades es obligatoria.
 
-Por eso cada adapter debe declarar capacidades reales.
-
----
-
-## 7. ProviderKey
-
-```ts
-type ProviderKey =
-  | 'ZKTECO_CVSECURITY'
-  | 'HIKVISION_RESEARCH'
-  | 'GENERIC_MOCK';
-```
-
-Reglas:
+Regla:
 
 ```text
-- providerKey no debe aparecer en lógica de dominio.
-- providerKey sí puede aparecer en provider adapter, ProviderInstallation, QA Harness y configuración técnica.
-- providerKey no debe usarse para saltarse ProviderCapabilityMatrix.
+Si capability = UNKNOWN, no se permite ejecutar como si fuera SUPPORTED.
 ```
 
 ---
 
-## 8. ProviderInstallation
+## 9. ProviderInstallation
 
 Representa una instalación técnica de proveedor conectada a un condominio, privada, caseta o Edge.
 
@@ -363,8 +512,9 @@ type ProviderInstallation = {
   id: string;
   condominiumId: string;
   privateAreaId?: string;
+  guardhouseId?: string;
   edgeNodeId?: string;
-  providerKey: ProviderKey;
+  providerKey: AccessProviderKey;
   displayName: string;
   status: ProviderInstallationStatus;
   connectionMode: ProviderConnectionMode;
@@ -377,7 +527,7 @@ type ProviderInstallation = {
 };
 ```
 
-### 8.1 Estados
+### 9.1 Estados
 
 ```ts
 type ProviderInstallationStatus =
@@ -390,7 +540,7 @@ type ProviderInstallationStatus =
   | 'ARCHIVED';
 ```
 
-### 8.2 Modos de conexión
+### 9.2 Modos de conexión
 
 ```ts
 type ProviderConnectionMode =
@@ -400,33 +550,33 @@ type ProviderConnectionMode =
   | 'RESEARCH_ONLY';
 ```
 
-Decisión v0.1:
+Decisión actual:
 
 ```text
 ZKTeco / CVSecurity → EDGE_LOCAL
-Hikvision → RESEARCH_ONLY hasta cerrar investigación
+Hikvision ISAPI PBAC → EDGE_LOCAL esperado, LAB_REQUIRED
 Generic Mock → local/test
 ```
 
 ---
 
-## 9. ProviderCapabilityMatrix
+## 10. ProviderCapabilityMatrix
 
-La matriz de capacidades es obligatoria.
-
-Su función es responder:
+La matriz de capacidades responde:
 
 ```text
 ¿Qué puede hacer realmente este proveedor en esta instalación concreta?
 ```
 
-No basta con que el proveedor lo soporte en teoría. Debe estar disponible para esa instalación.
+No basta con que el proveedor lo soporte en teoría. Debe estar disponible, configurado y probado para esa instalación.
 
 ```ts
 type ProviderCapabilityMatrix = {
   providerInstallationId: string;
-  providerKey: ProviderKey;
+  providerKey: AccessProviderKey;
+  source: 'DOCS' | 'LAB' | 'MOCK' | 'MANUAL_REVIEW';
   version: string;
+
   personManagement: CapabilitySupport;
   credentialManagement: CapabilitySupport;
   accessProfileManagement: CapabilitySupport;
@@ -434,6 +584,8 @@ type ProviderCapabilityMatrix = {
   doorMapping: CapabilitySupport;
   remoteDoorOpen: CapabilitySupport;
   accessEventRead: CapabilitySupport;
+  qrEventRead: CapabilitySupport;
+  remoteAccessCheck: CapabilitySupport;
   observedStateRead: CapabilitySupport;
   cardOrTagCredentials: CapabilitySupport;
   residentQr: CapabilitySupport;
@@ -442,15 +594,18 @@ type ProviderCapabilityMatrix = {
   vehiclePlateAccess: CapabilitySupport;
   offlineSnapshotValidation: CapabilitySupport;
   providerSideReconciliation: CapabilitySupport;
-  notes?: string;
+
+  notes?: string[];
+  limitations?: string[];
 };
 ```
 
-### 9.1 CapabilitySupport
+### 10.1 CapabilitySupport
 
 ```ts
 type CapabilitySupport = {
   status: 'SUPPORTED' | 'UNSUPPORTED' | 'PARTIAL' | 'UNKNOWN';
+  source: 'DOCS' | 'LAB' | 'MOCK' | 'ASSUMPTION_BLOCKED';
   requiresEdge?: boolean;
   requiresMapping?: boolean;
   requiresHardwareValidation?: boolean;
@@ -459,18 +614,19 @@ type CapabilitySupport = {
 };
 ```
 
-### 9.2 Reglas
+### 10.2 Reglas
 
 ```text
 UNKNOWN no se trata como SUPPORTED.
 PARTIAL requiere reglas explícitas.
-UNSUPPORTED debe ocultar o deshabilitar configuración dependiente.
-SUPPORTED debe estar probado por QA Harness antes de producción.
+UNSUPPORTED oculta/deshabilita configuración dependiente.
+SUPPORTED por documentación todavía puede requerir LAB_REQUIRED.
+SUPPORTED por laboratorio puede usarse en provider installation activa.
 ```
 
 ---
 
-## 10. Capability gates por configuración
+## 11. Capability gates por configuración
 
 La UI de configuración no debe mostrar opciones imposibles.
 
@@ -479,30 +635,26 @@ Ejemplos:
 ```text
 Si provider.guestQr = UNSUPPORTED:
 - ocultar o deshabilitar configuración de QR invitados dependiente del proveedor.
-- mantener QR interno solo si Tricor puede validarlo sin proveedor.
 
 Si provider.remoteDoorOpen = UNSUPPORTED:
 - deshabilitar apertura remota desde Guard.
-- permitir solo registro de evento manual, si aplica.
 
 Si provider.accessProfileManagement = UNSUPPORTED:
 - no permitir política de morosidad basada en cambio de perfil.
-- exigir estrategia alternativa validada o marcar instalación incompatible.
 
 Si provider.accessEventRead = UNKNOWN:
-- no prometer estado observado en tiempo real.
-- usar reconciliación manual o smoke test.
+- no prometer observed state en tiempo real.
 ```
 
-Regla general:
+Regla:
 
 ```text
-Configuración visible = módulo Tricor activo + capability del proveedor + rol del usuario + estado de instalación.
+Configuración visible = módulo Tricor activo + capability del proveedor + mapping válido + rol del usuario + estado de instalación.
 ```
 
 ---
 
-## 11. ProviderMapping
+## 12. ProviderMapping
 
 ProviderMapping traduce entidades canónicas de Tricor a entidades externas del proveedor.
 
@@ -523,7 +675,7 @@ type ProviderMapping = {
 };
 ```
 
-### 11.1 Tipos de mapping
+### 12.1 Tipos de mapping
 
 ```ts
 type ProviderMappingType =
@@ -537,7 +689,7 @@ type ProviderMappingType =
   | 'QR_STRATEGY';
 ```
 
-### 11.2 Estados
+### 12.2 Estados
 
 ```ts
 type ProviderMappingStatus =
@@ -549,27 +701,27 @@ type ProviderMappingStatus =
   | 'ARCHIVED';
 ```
 
-### 11.3 Regla crítica
+### 12.3 Regla crítica
 
 No se puede activar un proveedor si faltan mappings requeridos.
 
 Mappings mínimos v1:
 
 ```text
-- ACTIVE_ACCESS_PROFILE
-- MOROSO_DEFAULT_PROFILE
-- PEDESTRIAN_ACCESS_ZONE
-- VEHICULAR_ACCESS_ZONE
-- puertas/casetas operativas
-- credencial tarjeta/tag, si se usa
-- estrategia QR, si se usa
+ACTIVE_ACCESS_PROFILE
+MOROSO_DEFAULT_PROFILE
+PEDESTRIAN_ACCESS_ZONE
+VEHICULAR_ACCESS_ZONE
+puertas/casetas operativas
+credencial tarjeta/tag, si se usa
+estrategia QR, si se usa
 ```
 
 ---
 
-## 12. ProviderExternalRef
+## 13. ProviderExternalRef
 
-Tabla o estructura para guardar referencias externas sin contaminar entidades principales.
+Guarda referencias externas sin contaminar entidades principales.
 
 ```ts
 type ProviderExternalRef = {
@@ -590,39 +742,39 @@ type ProviderExternalRef = {
 Ejemplos:
 
 ```text
-Tricor Credential → proveedor card id externo
-Tricor AccessProfile → proveedor access level externo
-Tricor Door → proveedor door id externo
-Tricor ResponsiblePerson → proveedor person id externo
+Tricor Credential → card id/cardNo externo
+Tricor AccessProfile → access level / doorRight / RightPlan externo
+Tricor Door → door id externo
+Tricor ResponsiblePerson / PropertyAccessSubject → person pin / employeeNo externo
 ```
 
 ---
 
-## 13. Contratos canónicos de perfiles de acceso
+## 14. Perfiles canónicos de acceso
 
-Perfiles canónicos iniciales:
+Perfiles iniciales:
 
-```ts
-type AccessProfileKey =
-  | 'ACTIVE_ACCESS_PROFILE'
-  | 'MOROSO_DEFAULT_PROFILE'
-  | 'FORMER_RESIDENT_PROFILE'
-  | 'TEMPORARY_EXCEPTION_PROFILE'
-  | 'GUEST_PROFILE'
-  | 'STAFF_PROFILE_FUTURE';
+```text
+ACTIVE_ACCESS_PROFILE
+MOROSO_DEFAULT_PROFILE
+PEDESTRIAN_ONLY_PROFILE
+REVOKED_ACCESS_PROFILE
+TEMPORARY_EXCEPTION_PROFILE
 ```
 
-### 13.1 ACTIVE_ACCESS_PROFILE
+### 14.1 ACTIVE_ACCESS_PROFILE
 
-Estado normal de una propiedad al corriente.
+Representa permisos normales de una propiedad al corriente.
 
-Incluye todas las capacidades permitidas por su perfil de propiedad.
+No significa “todas las puertas”. Significa:
 
-No significa acceso universal.
+```text
+todos los accesos permitidos por su perfil y configuración.
+```
 
-### 13.2 MOROSO_DEFAULT_PROFILE
+### 14.2 MOROSO_DEFAULT_PROFILE
 
-Default aprobado:
+Default confirmado:
 
 ```text
 - peatonal permitido
@@ -632,1419 +784,860 @@ Default aprobado:
 - amenidades futuras bloqueadas
 ```
 
-Puede configurarse por condominio, pero debe respetar capability matrix.
+### 14.3 PEDESTRIAN_ONLY_PROFILE
 
-### 13.3 FORMER_RESIDENT_PROFILE
+Perfil explícito si el proveedor necesita mapping separado para conservar solo acceso peatonal.
 
-Para exresidentes o propietarios dados de baja.
+### 14.4 REVOKED_ACCESS_PROFILE
+
+Sin accesos operativos.
+
+Uso:
 
 ```text
-- sin acceso permanente
-- credenciales revocadas o archivadas
-- historial conservado
+exresidente después de periodo de gracia
+credencial perdida
+archivo/revocación controlada
 ```
 
-### 13.4 TEMPORARY_EXCEPTION_PROFILE
+### 14.5 TEMPORARY_EXCEPTION_PROFILE
 
-Para excepción temporal auditada.
+Permiso temporal auditado.
 
-```text
-- duración limitada
-- motivo obligatorio
-- responsable obligatorio
-- notificación a CondoAdmin
-- audit log obligatorio
-```
-
-### 13.5 GUEST_PROFILE
-
-Para visitantes.
+Debe tener:
 
 ```text
-- temporal
-- limitado por QR
-- ventana de tiempo
-- uso único o reglas configuradas
+motivo
+duración
+actor
+scope
+auditoría
+expiración
 ```
 
 ---
 
-## 14. Contratos canónicos de zonas de acceso
+## 15. ZKTeco / ZKBio CVSecurity strategy
 
-Zonas iniciales:
-
-```ts
-type AccessZoneKey =
-  | 'PEDESTRIAN'
-  | 'VEHICULAR'
-  | 'RESIDENT_QR'
-  | 'GUEST_QR'
-  | 'AMENITY_FUTURE'
-  | 'SERVICE_FUTURE'
-  | 'TECHNICAL_RESTRICTED';
-```
-
-### 14.1 PEDESTRIAN
-
-Acceso peatonal.
-
-Default en morosidad:
+### 15.1 Estado
 
 ```text
-permitido si el condominio conserva peatonal.
+ProviderKey: ZKTECO_CVSECURITY
+Documentación base: PROVIDER_ZKTECO_CVSECURITY_ADAPTER_SPEC_V0.1.md
+Lab plan: PROVIDER_ZKTECO_CVSECURITY_LAB_TEST_PLAN_V0.1.md
+Estado documental: CERTIFIED
+Estado implementación: BLOCKED hasta laboratorio
+ConnectionMode: EDGE_LOCAL
 ```
 
-### 14.2 VEHICULAR
-
-No implica módulo de vehículos.
-
-Significa zona/capacidad de acceso vehicular.
-
-Default en morosidad:
+### 15.2 Fuente técnica
 
 ```text
-bloqueado.
+ZKBio CVSecurity 3rd Party API User Manual
+Version 1.2
+Date November 2025
+Software Version ZKBio CVSecurity 6.0.0 or above
 ```
 
-### 14.3 RESIDENT_QR
+### 15.3 Endpoints core ZKTeco
 
-QR propio del residente/responsable.
-
-Puede bloquearse por morosidad si la política lo configura.
-
-### 14.4 GUEST_QR
-
-QR de invitados.
-
-Default en morosidad:
+#### Personas
 
 ```text
-bloqueado.
+POST /api/person/add?access_token={token}
+GET  /api/person/get/{pin}?access_token={token}
+GET  /api/person/get?pin={pin}&access_token={token}
+POST /api/person/getPersonList?access_token={token}
+POST /api/person/leave?access_token={token}
+POST /api/person/reinstated?access_token={token}
+POST /api/v2/person/addPersons?access_token={token}
+POST /api/v2/person/deleteByPins?access_token={token}&pins={pins}
 ```
 
-### 14.5 AMENITY_FUTURE
+#### Departamentos
 
-Zona futura, no módulo v1.
+```text
+POST /api/department/add?access_token={token}
+GET  /api/department/get?code={code}&access_token={token}
+POST /api/department/getDepartmentList?pageNo={pageNo}&pageSize={pageSize}&access_token={token}
+```
 
-Debe existir como concepto para que morosidad pueda bloquear zonas no esenciales en el futuro.
+#### Tarjetas
+
+```text
+GET  /api/card/getCards?pin={pin}&access_token={token}
+POST /api/card/set?access_token={token}
+```
+
+#### Puertas / lectores / apertura remota
+
+```text
+GET  /api/door/list?pageNo={pageNo}&pageSize={pageSize}&access_token={token}
+GET  /api/reader/list?pageNo={pageNo}&pageSize={pageSize}&access_token={token}
+POST /api/door/remoteOpenById?doorId={id}&interval={seconds}&access_token={token}
+POST /api/door/remoteOpenByName?doorName={name}&interval={seconds}&access_token={token}
+```
+
+#### Niveles de acceso
+
+```text
+GET  /api/accLevel/list?pageNo={pageNo}&pageSize={pageSize}&access_token={token}
+POST /api/accLevel/addLevel?access_token={token}
+POST /api/accLevel/addLevelDoor?access_token={token}
+POST /api/accLevel/addLevelPerson?access_token={token}
+```
+
+#### Transacciones / observed state
+
+```text
+GET/POST /api/transaction/list?access_token={token}
+GET/POST /api/transaction/getDoorTransactionDetail?access_token={token}
+```
+
+#### Entrance Control / PSG
+
+```text
+/api/psgDevice/*
+/api/psgGate/*
+/api/psgLevel/*
+/api/psgReader/*
+/api/psgTransaction/*
+```
+
+Estado actual PSG:
+
+```text
+LAB_RESEARCH / NOT CORE_V1 until actual gate/pluma is configured
+```
+
+#### Visitor / QR
+
+```text
+/api/visRegistration/*
+/api/person/getQrCode/{pin}
+/api/v2/person/getQrCode?pin={pin}
+```
+
+### 15.4 Mapeo canónico ZKTeco
+
+| Tricor | ZKTeco / CVSecurity |
+|---|---|
+| PropertyAccessSubject | `person.pin` |
+| Responsible display name | `person.name` / `lastName` |
+| PrivateArea / hierarchy | `department.code` / `parentCode` |
+| Credential card/tag | `cardNo`, `supplyCards`, `/api/card/set` |
+| ActiveAccessProfile | `accLevelIds` / `accLevel` |
+| MorosoAccessProfile | `accLevel` restringido |
+| Door | `doorId` / `doorName` |
+| Reader | `reader` list |
+| Manual open | `door/remoteOpenById` or `door/remoteOpenByName` |
+| Observed events | `transaction` endpoints |
+| Guest QR | visitor registration / QR endpoints |
+
+### 15.5 Reglas ZKTeco
+
+```text
+- Edge local obligatorio.
+- access_token vive en Edge secret storage.
+- success code default: 0, pero se debe confirmar en laboratorio.
+- Algunos endpoints/documentación pueden variar entre access_token y acc_token; no implementar variantes sin laboratorio.
+- Parking, elevator, biometría y video quedan fuera de v1.
+- PSG queda como research si no hay gate/pluma configurado.
+```
 
 ---
 
-## 15. Contrato canónico de credenciales
+## 16. Hikvision ISAPI Person-Based Access Control strategy
 
-Credencial representa medio de acceso autorizado ligado a una propiedad/responsable.
+### 16.1 Estado
+
+```text
+ProviderKey: HIKVISION_ISAPI_PBAC
+Documentación base: PROVIDER_RESEARCH_HIKVISION_V0.1.md
+Estado documental: CERTIFIED como research base
+Estado implementación: BLOCKED hasta laboratorio
+ConnectionMode esperado: EDGE_LOCAL
+```
+
+### 16.2 Fuente técnica
+
+```text
+Intelligent Security API (Person-Based Access Control) Developer Guide
+```
+
+La documentación de metadata/video queda degradada:
+
+```text
+PARTIAL / NOT AUTHORITATIVE FOR ACCESS CONTROL
+```
+
+### 16.3 Endpoints core Hikvision
+
+#### Capabilities
+
+```text
+GET /ISAPI/AccessControl/capabilities
+GET /ISAPI/AccessControl/AcsCfg/capabilities?format=json
+GET /ISAPI/AccessControl/AcsCfg?format=json
+```
+
+#### Personas / usuarios
+
+```text
+GET  /ISAPI/AccessControl/UserInfo/capabilities?format=json
+GET  /ISAPI/AccessControl/UserInfo/Count?format=json
+PUT  /ISAPI/AccessControl/UserInfo/Delete?format=json
+PUT  /ISAPI/AccessControl/UserInfo/Modify?format=json
+POST /ISAPI/AccessControl/UserInfo/Record?format=json
+POST /ISAPI/AccessControl/UserInfo/Search?format=json
+PUT  /ISAPI/AccessControl/UserInfo/SetUp?format=json
+GET  /ISAPI/AccessControl/UserInfoDetail/Delete/capabilities?format=json
+PUT  /ISAPI/AccessControl/UserInfoDetail/Delete?format=json
+GET  /ISAPI/AccessControl/UserInfoDetail/DeleteProcess?format=json
+```
+
+#### Tarjetas / credenciales
+
+```text
+GET  /ISAPI/AccessControl/CardInfo/capabilities?format=json
+GET  /ISAPI/AccessControl/CardInfo/Count?format=json
+PUT  /ISAPI/AccessControl/CardInfo/Delete?format=json
+PUT  /ISAPI/AccessControl/CardInfo/Modify?format=json
+POST /ISAPI/AccessControl/CardInfo/Record?format=json
+POST /ISAPI/AccessControl/CardInfo/Search?format=json
+PUT  /ISAPI/AccessControl/CardInfo/SetUp?format=json
+```
+
+#### Puerta / apertura remota
+
+```text
+GET /ISAPI/AccessControl/RemoteControl/door/capabilities
+PUT /ISAPI/AccessControl/RemoteControl/door/<ID>
+```
+
+#### Eventos / observed state
+
+```text
+GET  /ISAPI/AccessControl/AcsEvent/capabilities?format=json
+POST /ISAPI/AccessControl/AcsEvent?format=json
+GET  /ISAPI/AccessControl/QRCodeEvent/capabilities?format=json
+POST /ISAPI/AccessControl/QRCodeEvent?format=json
+GET  /ISAPI/AccessControl/remoteCheck/capabilities?format=json
+PUT  /ISAPI/AccessControl/remoteCheck?format=json
+```
+
+### 16.4 Mapeo canónico Hikvision
+
+| Tricor | Hikvision ISAPI PBAC |
+|---|---|
+| AccessIdentity / PropertyAccessSubject | `UserInfo.employeeNo` |
+| Responsible name | `UserInfo.name` |
+| Credential card/tag | `CardInfo.cardNo + employeeNo` |
+| AccessProfile | `UserInfo.doorRight + UserInfo.RightPlan` |
+| AccessZone / Door | `doorRight` door/lock ID |
+| Schedule / allowed time | `RightPlan` |
+| Manual open | `RemoteControl/door/<ID>` |
+| Observed access event | `AcsEvent` |
+| QR scan event | `QRCodeEvent` |
+| Remote validation | `remoteCheck` |
+| Exresident cleanup | `UserInfoDetail/Delete` or strategy selected by lab |
+
+### 16.5 Decisión central Hikvision
+
+Hikvision no usa el mismo modelo que ZKTeco `accLevel`.
+
+Mapping principal:
+
+```text
+Tricor AccessProfile
+→ Hikvision UserInfo.doorRight
+→ Hikvision UserInfo.RightPlan
+```
+
+Ejemplo conceptual:
+
+```text
+ACTIVE_ACCESS_PROFILE
+→ doorRight: puertas permitidas
+→ RightPlan: plan activo
+
+MOROSO_DEFAULT_PROFILE
+→ doorRight: solo puerta peatonal
+→ RightPlan: plan permitido
+
+REVOKED_ACCESS_PROFILE
+→ estrategia a definir en laboratorio:
+   - doorRight vacío
+   - Valid.endTime vencido
+   - CardInfo/Delete
+   - UserInfoDetail/Delete
+```
+
+### 16.6 Reglas Hikvision
+
+```text
+- No copiar modelo ZKTeco accLevel a Hikvision.
+- No asumir que Hikvision tiene perfiles equivalentes a ZKTeco.
+- No usar UserInfoDetail/Delete sin laboratorio; es destructivo.
+- No usar RemoteControl/door en producción sin hardware smoke.
+- No asumir Cloud directo; usar Edge local hasta prueba contraria.
+- QRCodeEvent no significa generación de QR por Tricor; es evento de lectura/escaneo.
+```
+
+---
+
+## 17. Mercado Pago boundary
+
+### 17.1 Estado
+
+```text
+Provider: Mercado Pago
+PaymentProviderKey: MERCADO_PAGO
+Documento: PAYMENT_PROVIDER_RESEARCH_MERCADO_PAGO_V0.1.md
+Estado documental: CERTIFIED_FOR_RESEARCH
+Implementación: BLOCKED hasta sandbox/OAuth/webhooks
+```
+
+### 17.2 Rol en Tricor
+
+Mercado Pago confirma pagos.
+
+No controla acceso.
+
+Flujo:
+
+```text
+Mercado Pago webhook
+→ Tricor valida firma
+→ Tricor consulta order/payment server-side
+→ Tricor marca pago confirmado
+→ Policy Engine recalcula acceso
+→ AccessCommand
+→ Edge
+→ Access Provider
+```
+
+### 17.3 Reglas
+
+```text
+- No mezclar dinero de mantenimiento con ingresos SaaS.
+- Cada condominio debe conectar su propia cuenta.
+- Transferencia manual existe como fallback auditado.
+- Webhook no basta; Tricor debe consultar API antes de confirmar pago.
+- Mercado Pago no pertenece a AccessProviderAdapter.
+```
+
+---
+
+## 18. AccessCommand
+
+Comando canónico generado por Tricor para ejecución por Edge/provider.
 
 ```ts
-type AccessCredential = {
+type AccessCommand = {
   id: string;
+  commandType: AccessCommandType;
+  condominiumId: string;
+  privateAreaId?: string;
   propertyId: string;
-  responsiblePersonId: string;
-  credentialType: CredentialType;
-  status: CredentialStatus;
-  label?: string;
-  providerExternalRefs: ProviderExternalRef[];
-  lastUsedAt?: string;
+  credentialId?: string;
+  providerInstallationId: string;
+  providerKey: AccessProviderKey;
+  desiredStateId: string;
+  idempotencyKey: string;
+  status: AccessCommandStatus;
+  payload: CanonicalAccessCommandPayload;
   issuedAt: string;
   expiresAt?: string;
-  revokedAt?: string;
-  lostReportedAt?: string;
-};
-```
-
-### 15.1 Tipos de credencial
-
-```ts
-type CredentialType =
-  | 'CARD_OR_TAG'
-  | 'RESIDENT_QR'
-  | 'GUEST_QR'
-  | 'TEMPORARY_QR'
-  | 'BIOMETRIC_FUTURE'
-  | 'PLATE_FUTURE';
-```
-
-### 15.2 Estados
-
-```ts
-type CredentialStatus =
-  | 'ACTIVE'
-  | 'SUSPENDED'
-  | 'LOST_REPORTED'
-  | 'REVOKED'
-  | 'EXPIRED'
-  | 'REPLACED'
-  | 'ARCHIVED';
-```
-
-### 15.3 Regla aprobada
-
-Las credenciales se controlan por propiedad y responsable, no por censo de habitantes.
-
-```text
-Propiedad A-101
-Responsable: Juan Pérez
-Límite: 3 credenciales activas
-Credenciales: TAG-001, TAG-002, QR residente
-```
-
-No es obligatorio asignar cada tag a un familiar específico.
-
----
-
-## 16. ProviderOperation
-
-Toda operación enviada a un proveedor debe registrarse como operación canónica.
-
-```ts
-type ProviderOperation = {
-  id: string;
-  providerInstallationId: string;
-  accessCommandId: string;
-  operationType: ProviderOperationType;
-  idempotencyKey: string;
-  status: ProviderOperationStatus;
-  requestHash: string;
-  providerResponseCode?: string;
-  providerResponseMessage?: string;
-  startedAt?: string;
   completedAt?: string;
-  failedAt?: string;
-  retryCount: number;
 };
 ```
 
-### 16.1 Tipos
+### 18.1 Command types
 
 ```ts
-type ProviderOperationType =
+type AccessCommandType =
   | 'APPLY_ACCESS_PROFILE'
+  | 'RESTRICT_ACCESS'
+  | 'RESTORE_ACCESS'
   | 'REVOKE_CREDENTIAL'
-  | 'RESTORE_CREDENTIAL'
   | 'DISABLE_CREDENTIAL'
   | 'OPEN_DOOR'
   | 'FETCH_OBSERVED_STATE'
-  | 'RECONCILE'
-  | 'VALIDATE_MAPPING'
-  | 'TEST_CONNECTION';
+  | 'RECONCILE_PROVIDER';
 ```
 
-### 16.2 Estados
+### 18.2 Command status
 
 ```ts
-type ProviderOperationStatus =
-  | 'QUEUED'
+type AccessCommandStatus =
+  | 'PENDING'
   | 'SENT_TO_EDGE'
-  | 'EXECUTING'
+  | 'EDGE_RECEIVED'
   | 'APPLIED'
   | 'APPLIED_UNCONFIRMED'
+  | 'CONFIRMED'
   | 'FAILED_RETRYABLE'
-  | 'FAILED_FINAL'
+  | 'FAILED_PERMANENT'
+  | 'BLOCKED_MAPPING_REQUIRED'
+  | 'BLOCKED_CAPABILITY_UNSUPPORTED'
+  | 'EXPIRED'
   | 'CANCELLED';
 ```
 
 ---
 
-## 17. AccessCommand
+## 19. DesiredAccessState
 
-AccessCommand es el comando de negocio que Tricor quiere ejecutar.
-
-```ts
-type AccessCommand = {
-  id: string;
-  condominiumId: string;
-  privateAreaId?: string;
-  propertyId?: string;
-  providerInstallationId: string;
-  desiredAccessStateId: string;
-  commandType: AccessCommandType;
-  commandScope: AccessCommandScope;
-  status: AccessCommandStatus;
-  priority: 'LOW' | 'NORMAL' | 'HIGH' | 'CRITICAL';
-  idempotencyKey: string;
-  reason: AccessCommandReason;
-  createdAt: string;
-  scheduledFor?: string;
-  completedAt?: string;
-};
-```
-
-### 17.1 Tipos
-
-```ts
-type AccessCommandType =
-  | 'APPLY_PROFILE'
-  | 'REVOKE_ACCESS'
-  | 'RESTORE_ACCESS'
-  | 'REVOKE_CREDENTIAL'
-  | 'RESTORE_CREDENTIAL'
-  | 'OPEN_DOOR_ONCE'
-  | 'RECONCILE_PROVIDER';
-```
-
-### 17.2 Reasons
-
-```ts
-type AccessCommandReason =
-  | 'PAYMENT_CONFIRMED'
-  | 'MOROSITY_APPLIED'
-  | 'MANUAL_PAYMENT_APPROVED'
-  | 'MANUAL_OPENING'
-  | 'TEMPORARY_EXCEPTION'
-  | 'MOVE_OUT'
-  | 'LOST_CREDENTIAL'
-  | 'PROVIDER_RECONCILIATION'
-  | 'ADMIN_CHANGE';
-```
-
----
-
-## 18. DesiredAccessState
-
-DesiredAccessState representa lo que Tricor quiere que sea verdad.
+Estado calculado por Tricor.
 
 ```ts
 type DesiredAccessState = {
   id: string;
   propertyId: string;
-  responsiblePersonId: string;
-  accessProfileKey: AccessProfileKey;
+  accessProfile: CanonicalAccessProfile;
   allowedZones: AccessZoneKey[];
-  blockedZones: AccessZoneKey[];
-  credentialStates: DesiredCredentialState[];
-  reason: DesiredAccessStateReason;
-  policyVersion: string;
-  providerMappingVersion: string;
-  createdAt: string;
+  deniedZones: AccessZoneKey[];
+  credentialStates: CredentialDesiredState[];
+  reason: DesiredAccessReason;
+  source: 'PAYMENT_CONFIRMED' | 'MOROSITY' | 'MANUAL_PAYMENT_APPROVED' | 'MOVE_OUT' | 'LOST_CREDENTIAL' | 'TEMPORARY_EXCEPTION' | 'ADMIN_CONFIG_CHANGE';
+  computedAt: string;
+  expiresAt?: string;
 };
 ```
 
-### 18.1 Regla
+### 19.1 Reasons
 
-DesiredAccessState no garantiza que el proveedor ya lo aplicó.
-
-Para eso existe ObservedAccessState.
+```ts
+type DesiredAccessReason =
+  | 'PROPERTY_CURRENT'
+  | 'PROPERTY_MOROSE'
+  | 'PAYMENT_RESTORED'
+  | 'MANUAL_PAYMENT_RESTORED'
+  | 'CREDENTIAL_LOST'
+  | 'MOVE_OUT_GRACE_ENDED'
+  | 'TEMPORARY_EXCEPTION_ACTIVE'
+  | 'ADMIN_OVERRIDE_AUDITED';
+```
 
 ---
 
-## 19. ObservedAccessState
+## 20. ObservedAccessState
 
-ObservedAccessState representa lo observado o confirmado desde Edge/proveedor.
+Estado observado desde proveedor o Edge.
 
 ```ts
 type ObservedAccessState = {
   id: string;
-  providerInstallationId: string;
   propertyId: string;
-  observedProfileKey?: AccessProfileKey;
-  observedAllowedZones?: AccessZoneKey[];
-  observedCredentialStates?: ObservedCredentialState[];
-  source: 'PROVIDER_EVENT' | 'EDGE_SYNC' | 'MANUAL_AUDIT' | 'HARDWARE_SMOKE';
-  observedAt: string;
-  confidence: 'HIGH' | 'MEDIUM' | 'LOW';
-  driftDetected: boolean;
-};
-```
-
-### 19.1 Regla de honestidad operativa
-
-Si el pago está confirmado pero Edge/proveedor no ha aplicado el cambio, el estado debe decir:
-
-```text
-PAYMENT_CONFIRMED_ACCESS_PENDING
-```
-
-No se debe mentir diciendo que el acceso ya está restaurado.
-
----
-
-## 20. ProviderEvent
-
-Evento externo normalizado.
-
-```ts
-type ProviderEvent = {
-  id: string;
   providerInstallationId: string;
-  externalEventId?: string;
-  eventType: ProviderEventType;
-  normalizedType: NormalizedAccessEventType;
-  externalPayloadHash: string;
-  occurredAt: string;
-  receivedAt: string;
-  relatedDoorId?: string;
-  relatedCredentialId?: string;
-  relatedPropertyId?: string;
+  providerKey: AccessProviderKey;
+  observedProfile?: string;
+  observedCredentials?: ObservedCredential[];
+  observedZones?: ObservedZone[];
+  lastProviderEventAt?: string;
+  source: 'PROVIDER_API' | 'EDGE_CACHE' | 'TRANSACTION_EVENT' | 'MANUAL_OBSERVATION' | 'UNKNOWN';
+  confidence: 'HIGH' | 'MEDIUM' | 'LOW' | 'UNKNOWN';
+  observedAt: string;
 };
-```
-
-### 20.1 NormalizedAccessEventType
-
-```ts
-type NormalizedAccessEventType =
-  | 'ACCESS_GRANTED'
-  | 'ACCESS_DENIED'
-  | 'DOOR_OPENED'
-  | 'DOOR_OPEN_FAILED'
-  | 'CARD_SWIPED'
-  | 'QR_SCANNED'
-  | 'REMOTE_OPEN_EXECUTED'
-  | 'PROVIDER_ERROR'
-  | 'UNKNOWN';
-```
-
----
-
-## 21. Estrategia de ZKTeco / CVSecurity
-
-### 21.1 Estado
-
-```text
-Estado: implementación v1
-Modo: Edge obligatorio
-Prioridad: máxima para MVP técnico
-```
-
-### 21.2 Capacidades esperadas a validar
-
-```text
-- conexión desde Edge
-- autenticación técnica
-- gestión de personas externas
-- gestión de tarjeta/tag
-- asignación de niveles/perfiles de acceso
-- lectura de eventos/transacciones
-- control remoto de puerta/salida auxiliar, si aplica
-- validación de estado observado
-```
-
-### 21.3 Reglas
-
-```text
-1. Tricor no debe llamar al proveedor directamente desde Web.
-2. Tricor Cloud no debe depender de red local del condominio.
-3. Edge ejecuta operaciones locales.
-4. ProviderAdapter traduce comandos canónicos.
-5. Todos los cambios deben pasar por AccessCommand.
-6. Todo resultado debe generar ProviderOperationResult.
-```
-
-### 21.4 Mappings mínimos
-
-```text
-ACTIVE_ACCESS_PROFILE → nivel/perfil externo activo
-MOROSO_DEFAULT_PROFILE → nivel/perfil externo restringido
-PEDESTRIAN → puerta/grupo peatonal externo
-VEHICULAR → puerta/grupo vehicular externo
-CARD_OR_TAG → tipo credencial externo
-DOOR → puerta externa
-```
-
-### 21.5 QA obligatorio
-
-```text
-pnpm qa:provider-contract zkteco --mock
-pnpm qa:edge sync --provider zkteco --mock
-pnpm qa:flow property-debt-access-lifecycle --provider zkteco --mock
-pnpm qa:hardware-smoke zkteco --manual-approval
-```
-
----
-
-## 22. Estrategia de Hikvision
-
-### 22.1 Estado
-
-```text
-Estado: research track
-Modo: por definir
-Prioridad: alta después de cerrar proveedor v1
-```
-
-### 22.2 Superficies candidatas
-
-```text
-- ISAPI directo a dispositivo/controlador/servidor local
-- HikCentral Professional OpenAPI
-- Hik-Connect OpenAPI
-- Device Gateway / integración LAN-WAN
-```
-
-### 22.3 Decisión v0.1
-
-No implementar producción todavía.
-
-Hikvision debe avanzar por laboratorio y matriz de capacidades.
-
-### 22.4 Riesgos conocidos
-
-```text
-- no todos los dispositivos soportan las mismas capacidades
-- QR dinámico puede no encajar con el flujo Tricor
-- remote door open puede depender de plataforma/dispositivo
-- eventos pueden variar por ruta de integración
-- puede requerir cuenta partner, sandbox, instalación local o licencia adicional
-```
-
-### 22.5 Condición para implementación
-
-Hikvision solo puede pasar a implementación si existe:
-
-```text
-- hardware o sandbox validado
-- ProviderCapabilityMatrix confirmada
-- mappings mínimos confirmados
-- provider contract tests
-- Edge/cloud decision cerrada
-- seguridad de credenciales documentada
-- smoke test real aprobado
-```
-
----
-
-## 23. Generic Mock Provider
-
-El mock provider es obligatorio para desarrollo.
-
-```text
-Estado: obligatorio en QA Harness
-Modo: local/test
-```
-
-Debe simular:
-
-```text
-- personas
-- credenciales
-- puertas
-- perfiles de acceso
-- zonas
-- eventos
-- opening remoto
-- fallas del proveedor
-- latencia
-- respuestas parciales
-- drift entre Tricor y proveedor
-```
-
-Debe permitir probar sin hardware real.
-
----
-
-## 24. Estrategia de activación de proveedor en Tricor Condo
-
-Flujo recomendado:
-
-```text
-1. CondoAdmin abre Configuración → Proveedor de acceso.
-2. Selecciona proveedor disponible.
-3. Tricor crea ProviderInstallation en DRAFT.
-4. Soporte técnico configura conexión/Edge.
-5. Tricor ejecuta test de conexión.
-6. Tricor detecta o configura ProviderCapabilityMatrix.
-7. Se configuran mappings mínimos.
-8. QA Harness ejecuta provider-contract.
-9. Se ejecuta smoke test.
-10. ProviderInstallation pasa a ACTIVE.
-```
-
-No se debe permitir activación manual sin pruebas.
-
----
-
-## 25. UI de configuración de proveedor
-
-Panel:
-
-```text
-Tricor Condo → Configuración → Proveedor de acceso
-```
-
-Debe mostrar:
-
-```text
-- proveedor activo
-- estado de instalación
-- Edge asociado
-- última conexión exitosa
-- capabilities soportadas
-- mappings requeridos
-- mappings faltantes
-- pruebas ejecutadas
-- incidentes técnicos
-```
-
-Modo avanzado/técnico:
-
-```text
-- IDs externos
-- endpoint local/remoto
-- logs técnicos
-- prueba de conexión
-- validación de mappings
-- capability matrix cruda
-```
-
-No mostrar al usuario normal:
-
-```text
-- secretos
-- tokens
-- payloads completos
-- credenciales técnicas
-```
-
----
-
-## 26. Estrategia de provider mappings
-
-Los mappings deben ser explícitos, versionados y auditables.
-
-No se permite “adivinar” perfiles externos por nombre en producción.
-
-### 26.1 Regla de validación
-
-Antes de activar proveedor:
-
-```text
-- todos los perfiles requeridos deben mapearse
-- todas las puertas operativas deben mapearse
-- todas las zonas usadas por política deben mapearse
-- todos los tipos de credencial usados deben mapearse
-```
-
-### 26.2 Mapping stale
-
-Si el proveedor cambia y el mapping deja de ser válido:
-
-```text
-ProviderMappingStatus = STALE
-ProviderInstallationStatus = DEGRADED
-Se crea incidente técnico
-Se bloquean cambios peligrosos
-```
-
----
-
-## 27. Provider capability resolver
-
-Cada adapter debe tener un resolver.
-
-```ts
-type ProviderCapabilityResolver = {
-  resolveStaticCapabilities(providerKey: ProviderKey): ProviderCapabilityMatrix;
-  resolveInstallationCapabilities(input: ProviderInstallation): Promise<ProviderCapabilityMatrix>;
-  validateCapabilityForPolicy(input: CapabilityPolicyValidationInput): ValidationResult;
-};
-```
-
-El resolver debe responder:
-
-```text
-- qué capacidades existen en abstracto
-- qué capacidades existen en esta instalación
-- qué capacidades dependen de hardware
-- qué capacidades dependen de mapping
-- qué capacidades dependen de Edge
-```
-
----
-
-## 28. Estrategia de QR por proveedor
-
-QR es una capacidad sensible.
-
-Tricor debe diferenciar:
-
-```text
-QR generado por Tricor
-QR validado por Tricor Guard/Edge
-QR nativo del proveedor
-QR que abre directamente puerta/proveedor
-```
-
-### 28.1 Regla
-
-No asumir que un proveedor soporta QR dinámico con el mismo modelo de Tricor.
-
-Si el proveedor no soporta QR nativo:
-
-```text
-Tricor puede validar QR en Guard/Edge.
-Luego Guard/Edge solicita apertura remota si la política lo permite.
-```
-
-Si el proveedor soporta QR nativo:
-
-```text
-El adapter debe probar expiración, revocación, uso único y bloqueo por morosidad.
-```
-
----
-
-## 29. Estrategia de apertura remota
-
-Apertura remota no es permiso permanente.
-
-Es evento único.
-
-```text
-OPEN_DOOR_ONCE
-```
-
-Permitido para:
-
-```text
-- QR válido y puerta/pluma no respondió automáticamente
-- GuardSupervisor con motivo
-- excepción operativa temporal dentro de límites
-```
-
-No permitido:
-
-```text
-- guardia normal sin QR válido
-- usuario sin rol
-- proveedor sin capability remoteDoorOpen
-- instalación degradada sin confirmación
-```
-
-Debe registrar:
-
-```text
-- quién abrió
-- dónde
-- cuándo
-- motivo
-- puerta/caseta
-- QR o persona relacionada, si aplica
-- estado de morosidad
-- resultado del proveedor
-```
-
----
-
-## 30. Estrategia de excepción temporal
-
-Excepción temporal no es apertura manual.
-
-Es un cambio temporal de política.
-
-```text
-TemporaryAccessException
-```
-
-Debe tener:
-
-```text
-- propiedad
-- responsable
-- motivo
-- duración
-- permisos permitidos
-- creador
-- aprobador, si aplica
-- expiración automática
-- auditoría
-```
-
-GuardSupervisor puede crear excepción temporal justificada dentro de límites.
-
-Reglas recomendadas:
-
-```text
-- duración corta por default
-- notificación a CondoAdmin
-- no permitir excepción indefinida
-- no permitir saltarse capability matrix
-- no permitir acceso a zonas técnicas
-```
-
----
-
-## 31. Estrategia de reconciliación
-
-Tricor debe comparar estado deseado vs estado observado.
-
-```text
-DesiredAccessState
-vs
-ObservedAccessState
-```
-
-Drift examples:
-
-```text
-- Tricor cree que TAG-001 está revocado, pero proveedor lo muestra activo.
-- Tricor cree que propiedad está en perfil moroso, pero proveedor la tiene en activo.
-- Tricor tiene puerta vehicular mapeada, pero proveedor ya no la reporta.
-- Proveedor tiene persona/credencial sin referencia Tricor.
-```
-
-Acción:
-
-```text
-- crear incidente
-- marcar drift
-- reintentar corrección si es seguro
-- pedir revisión si implica revocación masiva o datos desconocidos
-```
-
----
-
-## 32. Estrategia de credenciales obsoletas
-
-El provider adapter debe soportar el ciclo de vida aprobado.
-
-Casos:
-
-```text
-- exresidente
-- mudanza con días de gracia
-- credencial perdida
-- credencial inactiva
-- credencial activa sin propiedad válida
-- credencial en proveedor sin referencia Tricor
-```
-
-Reglas:
-
-```text
-Exresidente → revocar/archivar credenciales.
-Mudanza → respetar periodo de gracia configurado.
-Credencial perdida → revocar de inmediato.
-Credencial sin uso → alerta no invasiva.
-Credencial externa desconocida → incidente de reconciliación.
-```
-
----
-
-## 33. Estrategia de seguridad
-
-### 33.1 Secretos
-
-Secretos de proveedor:
-
-```text
-- nunca en frontend
-- nunca en logs planos
-- nunca en reportes de usuario
-- cifrados o guardados mediante secret manager
-- rotación documentada
-```
-
-### 33.2 Permisos mínimos
-
-La cuenta técnica del proveedor debe tener solo permisos necesarios.
-
-```text
-- personas/credenciales necesarios
-- perfiles/puertas necesarios
-- lectura de eventos si aplica
-- apertura remota si aplica
-```
-
-### 33.3 Tenant isolation
-
-Un proveedor instalado en un condominio no puede afectar otro condominio.
-
-QA debe probar:
-
-```text
-Tricor Condo A con proveedor A no puede leer ni modificar proveedor B.
-```
-
----
-
-## 34. Estrategia de errores
-
-Los errores de proveedor deben normalizarse.
-
-```ts
-type ProviderErrorCode =
-  | 'AUTH_FAILED'
-  | 'CONNECTION_FAILED'
-  | 'TIMEOUT'
-  | 'CAPABILITY_UNSUPPORTED'
-  | 'MAPPING_MISSING'
-  | 'MAPPING_INVALID'
-  | 'EXTERNAL_NOT_FOUND'
-  | 'EXTERNAL_CONFLICT'
-  | 'RATE_LIMITED'
-  | 'PROVIDER_VALIDATION_ERROR'
-  | 'UNKNOWN_PROVIDER_ERROR';
-```
-
-Cada error debe indicar:
-
-```text
-- retryable sí/no
-- severidad
-- usuario afectado
-- operación afectada
-- siguiente acción recomendada
-```
-
----
-
-## 35. Idempotencia
-
-Toda operación externa debe ser idempotente desde Tricor.
-
-```text
-Mismo comando + misma versión de estado + misma instalación = misma idempotencyKey.
-```
-
-No se permite reintentar comandos creando duplicados externos.
-
-Ejemplo:
-
-```text
-RestoreAccess(Property A-101, policyVersion 14, mappingVersion 3)
-→ idempotencyKey estable
-```
-
----
-
-## 36. Auditoría
-
-Toda operación de proveedor debe crear auditoría.
-
-```text
-- configuración de proveedor creada
-- test de conexión ejecutado
-- mapping creado/modificado
-- capability matrix actualizada
-- comando enviado
-- comando aplicado
-- comando fallido
-- drift detectado
-- apertura remota ejecutada
-- excepción temporal aplicada
-```
-
-La auditoría debe ser visible según rol:
-
-```text
-Platform → global/soporte
-CondoAdmin → condominio
-Finance → pagos relacionados, no secretos técnicos
-GuardSupervisor → eventos de guardia
-Resident → solo información propia relevante
-```
-
----
-
-## 37. QA Harness para provider strategy
-
-QA Harness debe incluir suites específicas.
-
-```text
-qa:provider-contract
-qa:provider-capabilities
-qa:provider-mappings
-qa:provider-errors
-qa:provider-reconciliation
-qa:provider-idempotency
-qa:provider-security
-qa:provider-edge-sync
-```
-
-### 37.1 Pruebas mínimas
-
-```text
-1. No activa proveedor sin mappings mínimos.
-2. No muestra configuración si capability no está soportada.
-3. No ejecuta apertura remota si remoteDoorOpen es UNSUPPORTED.
-4. No aplica perfil moroso si el mapping está ausente.
-5. Reintenta comando retryable sin duplicar operación externa.
-6. Marca drift cuando observed state contradice desired state.
-7. Revoca credencial perdida.
-8. Revoca credencial de exresidente al terminar gracia.
-9. No revoca automáticamente credencial sin uso; solo alerta.
-10. Aísla proveedor por condominio.
-11. No filtra secretos en reportes.
-12. Genera reporte markdown/json para Claude Code CLI.
-```
-
----
-
-## 38. Provider mock contract
-
-El mock debe implementar el mismo contrato.
-
-No debe ser “un mock feliz”. Debe simular fallas.
-
-```text
-- éxito
-- timeout
-- auth failed
-- mapping missing
-- unsupported capability
-- partial applied
-- stale mapping
-- drift
-- offline
-- duplicate command
-```
-
-El mock debe permitir fixtures:
-
-```text
-providerCapabilities.supported.json
-providerCapabilities.partial.json
-providerCapabilities.unsupportedQr.json
-providerMappings.valid.json
-providerMappings.missingProfile.json
-providerMappings.staleDoor.json
-```
-
----
-
-## 39. Provider adapter skeleton recomendado
-
-Ubicación:
-
-```text
-packages/provider-sdk/
-apps/edge/src/providers/
-apps/api/src/provider-installations/
-```
-
-Estructura conceptual:
-
-```text
-packages/provider-sdk/
-├── src/
-│   ├── contracts/
-│   │   ├── access-provider-adapter.ts
-│   │   ├── provider-capability-matrix.ts
-│   │   ├── provider-mapping.ts
-│   │   ├── provider-operation.ts
-│   │   └── provider-errors.ts
-│   ├── validators/
-│   │   ├── capability-validator.ts
-│   │   └── mapping-validator.ts
-│   └── testing/
-│       └── mock-provider.ts
-
-apps/edge/src/providers/
-├── generic-mock/
-├── zkteco-cvsecurity/
-└── hikvision-research/
 ```
 
 Regla:
 
 ```text
-hikvision-research no es producción.
+ObservedAccessState no sustituye a DesiredAccessState.
+Sirve para detectar drift, confirmar aplicación o generar incidentes.
 ```
 
 ---
 
-## 40. Reglas de dependencia
+## 21. ProviderOperationResult
 
-Permitido:
-
-```text
-packages/domain → define conceptos canónicos.
-packages/provider-sdk → importa contracts canónicos.
-apps/api → usa provider-sdk para orquestar.
-apps/edge → usa provider-sdk para ejecutar adapters.
-apps/qa → usa provider-sdk para test contracts.
-```
-
-Prohibido:
-
-```text
-packages/domain → importar adapters específicos.
-apps/web → llamar proveedor directamente.
-apps/web → conocer secretos de proveedor.
-Policy Engine → depender de providerKey concreto.
-DB core → columnas específicas de proveedor en entidades principales.
-```
-
----
-
-## 41. Provider activation gates
-
-Un proveedor solo puede pasar a ACTIVE si cumple:
-
-```text
-1. ProviderInstallation validada.
-2. ProviderCapabilityMatrix resuelta.
-3. Mappings mínimos completos.
-4. Test de conexión aprobado.
-5. Provider contract tests aprobados.
-6. Edge sync aprobado, si aplica.
-7. Smoke test aprobado, si aplica.
-8. Auditoría registrada.
-9. CondoAdmin/PlatformSupport confirma activación.
-```
-
-Si falla:
-
-```text
-ProviderInstallationStatus = DEGRADED o PENDING_VALIDATION.
-```
-
----
-
-## 42. Provider deprecation y cambio de proveedor
-
-Cambiar proveedor es operación crítica.
-
-Debe requerir:
-
-```text
-- modo mantenimiento
-- backup de mappings
-- export de referencias externas
-- bloqueo temporal de comandos no críticos
-- validación de nuevo proveedor
-- reconciliación posterior
-- aprobación administrativa
-```
-
-No se permite cambiar proveedor sin auditoría.
-
----
-
-## 43. Relación con Tricor Platform
-
-Tricor Platform debe ver:
-
-```text
-- proveedores activos por condominio
-- estado de instalación
-- estado de Edge
-- capacidad soportada
-- health checks
-- incidentes técnicos
-- versiones de mapping
-- últimas sincronizaciones
-```
-
-No debe mezclar esto con dinero de mantenimiento.
-
----
-
-## 44. Relación con Tricor Condo
-
-Tricor Condo debe permitir:
-
-```text
-- seleccionar proveedor permitido
-- ver estado de conexión
-- configurar zonas/perfiles desde UI controlada
-- ver warnings de capability
-- solicitar soporte técnico
-- revisar incidentes de proveedor
-```
-
-No debe permitir:
-
-```text
-- editar secretos crudos
-- saltarse QA de provider
-- crear mappings peligrosos sin validación
-- activar capacidades no soportadas
-```
-
----
-
-## 45. Relación con Tricor Guard
-
-Tricor Guard no habla con proveedor directamente.
-
-Flujo:
-
-```text
-Guard escanea QR
-→ Tricor valida política
-→ si corresponde, genera OPEN_DOOR_ONCE
-→ Edge/provider ejecuta
-→ Guard ve resultado
-```
-
-Si el proveedor no soporta apertura remota:
-
-```text
-Guard ve instrucción operativa, pero no botón de apertura remota.
-```
-
----
-
-## 46. Relación con Tricor Resident
-
-Tricor Resident no sabe qué proveedor hay detrás.
-
-Solo muestra:
-
-```text
-- acceso activo
-- acceso restringido
-- pago pendiente
-- pago confirmado, acceso pendiente si Edge/proveedor no aplicó
-- credenciales activas/bloqueadas
-```
-
-No muestra:
-
-```text
-- IDs externos
-- errores técnicos del proveedor
-- payloads
-```
-
----
-
-## 47. Contratos de respuesta para UI
-
-La UI debe usar proyecciones, no modelos técnicos crudos.
+Resultado normalizado de una operación del provider.
 
 ```ts
-type ProviderHealthProjection = {
-  providerName: string;
-  status: 'OK' | 'DEGRADED' | 'OFFLINE' | 'PENDING_SETUP';
-  lastSyncLabel: string;
-  capabilitiesSummary: string[];
-  requiredActions: string[];
+type ProviderOperationResult = {
+  ok: boolean;
+  providerKey: AccessProviderKey;
+  providerInstallationId: string;
+  operation: ProviderOperationName;
+  providerRequestId?: string;
+  providerStatusCode?: string | number;
+  normalizedStatus:
+    | 'SUCCESS'
+    | 'SUCCESS_UNCONFIRMED'
+    | 'RETRYABLE_ERROR'
+    | 'PERMANENT_ERROR'
+    | 'UNSUPPORTED_CAPABILITY'
+    | 'MAPPING_REQUIRED'
+    | 'AUTH_FAILED'
+    | 'NETWORK_ERROR'
+    | 'UNKNOWN_ERROR';
+  rawResponseRef?: string;
+  errorClass?: ProviderErrorClass;
+  message?: string;
 };
 ```
 
+### 21.1 Error classes
+
 ```ts
-type AccessStateProjection = {
-  propertyId: string;
-  displayStatus: 'ACTIVE' | 'RESTRICTED' | 'PENDING_RESTORE' | 'PENDING_REVOKE' | 'UNKNOWN';
-  allowedLabels: string[];
-  blockedLabels: string[];
-  pendingActions: string[];
-};
+type ProviderErrorClass =
+  | 'AUTH_INVALID'
+  | 'TOKEN_EXPIRED'
+  | 'NETWORK_TIMEOUT'
+  | 'TLS_ERROR'
+  | 'MAPPING_NOT_FOUND'
+  | 'PERSON_NOT_FOUND'
+  | 'CREDENTIAL_NOT_FOUND'
+  | 'DOOR_NOT_FOUND'
+  | 'ACCESS_PROFILE_NOT_FOUND'
+  | 'UNSUPPORTED_OPERATION'
+  | 'PROVIDER_REJECTED'
+  | 'PROVIDER_INTERNAL_ERROR'
+  | 'UNKNOWN';
 ```
 
 ---
 
-## 48. Reglas para Claude Code CLI
+## 22. Revocación y restauración canónica
 
-Claude Code CLI debe obedecer:
+### 22.1 Morosidad
 
 ```text
-1. No implementar lógica de proveedor dentro del dominio.
-2. No crear columnas específicas de proveedor en entidades principales.
-3. No llamar proveedor desde frontend.
-4. No activar capabilities sin ProviderCapabilityMatrix.
-5. No omitir ProviderMappingValidator.
-6. No mezclar proveedores en el mismo adapter.
-7. No asumir que Hikvision está listo para producción.
-8. No cambiar stack técnico aprobado.
-9. No saltarse QA Harness.
-10. No introducir tecnologías vetadas.
+Property becomes MOROSE
+→ Policy Engine computes MOROSO_DEFAULT_PROFILE
+→ DesiredAccessState created
+→ AccessCommand.RESTRICT_ACCESS
+→ Provider adapter applies external mapping
+→ ObservedAccessState fetched if supported
+→ AuditEvent created
 ```
 
-Cada tarea de proveedor debe entregar:
+### 22.2 Pago confirmado
 
 ```text
-- cambios realizados
-- archivos tocados
-- provider contract tests ejecutados
-- QA report
-- limitaciones
-- capabilities nuevas o modificadas
+Payment provider confirms payment
+→ Payment status CONFIRMED
+→ Debt recalculated
+→ Policy Engine computes ACTIVE_ACCESS_PROFILE
+→ AccessCommand.RESTORE_ACCESS
+→ Edge/provider applies access
+→ AuditEvent created
+```
+
+### 22.3 Transferencia manual fallback
+
+```text
+Finance/CondoAdmin approves manual transfer
+→ Payment status APPROVED_MANUAL
+→ Policy Engine recalculates access
+→ Restore workflow
+→ AuditEvent created
+```
+
+### 22.4 Tarjeta perdida
+
+```text
+Resident reports credential lost
+→ Credential status LOST_REPORTED
+→ AccessCommand.REVOKE_CREDENTIAL or DISABLE_CREDENTIAL
+→ Provider adapter revokes/disables external credential
+→ AuditEvent created
+```
+
+### 22.5 Exresidente / mudanza
+
+```text
+MoveOut grace period ends
+→ PropertyResponsibility becomes FORMER/ARCHIVED
+→ related credentials evaluated
+→ AccessCommand.REVOKE_CREDENTIAL or APPLY REVOKED profile
+→ provider cleanup strategy selected by adapter/lab result
+→ AuditEvent created
 ```
 
 ---
 
-## 49. Prompt recomendado para Claude Code CLI
+## 23. Provider-specific translation examples
+
+### 23.1 Tricor → ZKTeco
 
 ```text
-Objetivo: implementar la base de provider strategy y contratos canónicos de Tricor Hábitat.
+ACTIVE_ACCESS_PROFILE
+→ accLevelIds = Pagador/external active level
 
-Fuentes de verdad:
-- PROJECT_CHARTER_TRICOR_HABITAT.md
-- DOMAIN_MODEL_V0.1.md
-- ACCESS_POLICY_CONFIGURATION_V0.1.md
-- CLOUD_EDGE_ARCHITECTURE_V0.1.md
-- QA_HARNESS_SPEC_V0.1.md
-- REPO_STRUCTURE_V0.1.md
-- PROVIDER_STRATEGY_AND_CANONICAL_CONTRACTS_V0.1.md
+MOROSO_DEFAULT_PROFILE
+→ accLevelIds = Moroso/restricted level
+
+OPEN_DOOR
+→ /api/door/remoteOpenById
+
+Observed events
+→ /api/transaction/list or /api/transaction/getDoorTransactionDetail
+```
+
+### 23.2 Tricor → Hikvision
+
+```text
+ACTIVE_ACCESS_PROFILE
+→ UserInfo.doorRight = allowed door list
+→ UserInfo.RightPlan = active schedule plan
+
+MOROSO_DEFAULT_PROFILE
+→ UserInfo.doorRight = pedestrian-only door list
+→ UserInfo.RightPlan = allowed schedule
+
+OPEN_DOOR
+→ PUT /ISAPI/AccessControl/RemoteControl/door/<ID>
+
+Observed events
+→ POST /ISAPI/AccessControl/AcsEvent?format=json
+```
+
+---
+
+## 24. QR strategy
+
+Tricor debe distinguir dos tipos de QR:
+
+```text
+Tricor-generated QR
+Provider-generated QR
+```
+
+### 24.1 Resident QR
+
+Puede ser:
+
+```text
+- QR generado por Tricor y validado por Tricor/Edge.
+- QR generado por proveedor si el provider lo soporta.
+```
+
+### 24.2 Guest QR
+
+Puede ser:
+
+```text
+- Tricor-generated guest QR.
+- Provider visitor QR si el proveedor lo soporta y laboratorio lo confirma.
+```
+
+### 24.3 Reglas
+
+```text
+- No asumir que QRCodeEvent equivale a generación de QR.
+- QRCodeEvent puede ser solo evento de lectura/escaneo.
+- Si Tricor genera QR, el provider debe poder abrir puerta o Edge debe poder validar y ejecutar apertura.
+- Si provider genera QR, debe existir mapping y reglas de expiración.
+```
+
+---
+
+## 25. Remote open strategy
+
+Remote open es operación física sensible.
 
 Reglas:
-- No implementar provider real todavía salvo skeleton aprobado.
-- Crear contracts type-safe en packages/provider-sdk.
-- Crear ProviderCapabilityMatrix base.
-- Crear ProviderMapping contracts.
-- Crear mock provider para QA.
-- No introducir lógica específica de proveedor en packages/domain.
-- No tocar UI salvo tipos/proyecciones si la tarea lo pide.
-- Ejecutar QA Harness correspondiente.
 
-Entregables:
-- provider-sdk skeleton
-- mock provider
-- validators
-- QA tests iniciales
-- reporte de ejecución
+```text
+- Solo GuardSupervisor o actor autorizado.
+- Requiere motivo rápido.
+- Requiere auditoría.
+- Requiere ProviderCapabilityMatrix.remoteDoorOpen = SUPPORTED por LAB.
+- Nunca se habilita solo por documentación.
+- Debe existir hardware smoke test.
+```
+
+Provider translations:
+
+```text
+ZKTeco: /api/door/remoteOpenById or /api/door/remoteOpenByName
+Hikvision: /ISAPI/AccessControl/RemoteControl/door/<ID>
 ```
 
 ---
 
-## 50. Implementación por fases
+## 26. Reconciliación y drift
 
-### Fase 1 — Contratos puros
+El provider adapter debe permitir reconciliación cuando sea posible.
+
+### 26.1 Drift cases
 
 ```text
-- ProviderKey
-- ProviderInstallation
-- ProviderCapabilityMatrix
-- ProviderMapping
-- ProviderExternalRef
-- ProviderOperation
-- ProviderError
-- ProviderEvent
+Tricor cree que perfil es ACTIVE, proveedor tiene MOROSO.
+Tricor cree que tarjeta está revocada, proveedor la mantiene activa.
+Proveedor contiene persona/credencial que Tricor no conoce.
+Edge aplicó comando, pero Cloud no recibió confirmación.
 ```
 
-### Fase 2 — Validators
+### 26.2 Reglas
 
 ```text
-- ProviderMappingValidator
-- ProviderCapabilityResolver
-- ProviderConfigValidator
-```
-
-### Fase 3 — Mock provider
-
-```text
-- mock feliz
-- mock con fallas
-- mock con capabilities parciales
-- mock con drift
-```
-
-### Fase 4 — Integración con QA Harness
-
-```text
-- qa:provider-contract
-- qa:provider-capabilities
-- qa:provider-mappings
-- qa:provider-reconciliation
-```
-
-### Fase 5 — Adapter ZKTeco / CVSecurity
-
-```text
-- Edge connector
-- auth técnica
-- mappings mínimos
-- apply profile
-- revoke/restore credential
-- observed state inicial
-- smoke test controlado
-```
-
-### Fase 6 — Research Hikvision
-
-```text
-- no producción
-- laboratorio
-- capability matrix confirmada
-- decisión edge/cloud
-- adapter skeleton solo después de validación
+- Drift no debe arreglarse silenciosamente sin auditoría.
+- QA Harness debe tener pruebas de drift.
+- Provider adapter debe reportar UNKNOWN si no puede observar estado.
+- Observed state con confianza LOW no debe marcar comando como CONFIRMED.
 ```
 
 ---
 
-## 51. Definition of Done del provider layer
+## 27. Seguridad
 
-Se considera DONE cuando:
+### 27.1 Secretos
 
 ```text
-1. Provider contracts existen en packages/provider-sdk.
-2. ProviderCapabilityMatrix es obligatoria.
-3. ProviderMappingValidator bloquea configuraciones incompletas.
-4. Mock provider pasa QA.
-5. QA Harness genera reportes markdown/json.
-6. Domain no importa provider adapters.
-7. Web no llama proveedor directamente.
-8. Edge ejecuta provider operations mediante contratos.
-9. Auditoría registra operaciones externas.
-10. No existen términos ni tecnologías vetadas.
+- access_token ZKTeco no se registra en logs.
+- credenciales Digest/Basic Hikvision no se registran en logs.
+- Mercado Pago access token no se registra en logs.
+- Secrets viven referenciados por secretRef.
+```
+
+### 27.2 Tenant isolation
+
+```text
+Un provider installation pertenece a un condominio.
+Un Edge no debe operar provider installations de otro condominio.
+Un mapping no debe cruzar tenants.
+```
+
+### 27.3 Operaciones destructivas
+
+Requieren laboratorio y confirmación:
+
+```text
+ZKTeco delete person / bulk delete
+Hikvision UserInfoDetail/Delete
+remote open de puerta
+revocación masiva
+cambio de mapping activo
 ```
 
 ---
 
-## 52. Riesgos principales
+## 28. QA requirements para Provider Strategy
 
-| Riesgo | Impacto | Mitigación |
-|---|---:|---|
-| Proveedor no soporta capacidad esperada | Alto | ProviderCapabilityMatrix y laboratorio. |
-| Mapping incorrecto | Alto | ProviderMappingValidator + QA Harness. |
-| Edge offline | Alto | Command queue, pending states e incidentes. |
-| QR no compatible con proveedor | Medio/Alto | QR Tricor validado por Guard/Edge como fallback. |
-| Remote open inseguro | Alto | roles, motivo, auditoría, capability gate. |
-| Datos externos obsoletos | Alto | reconciliación y drift detection. |
-| Secretos filtrados | Crítico | secret manager, redacción de logs, QA security. |
-| Integrar segundo proveedor demasiado pronto | Alto | research track no bloqueante. |
+Este documento no actualiza QA Harness, pero define lo que QA debe cubrir después.
 
----
-
-## 53. Glosario breve
-
-| Término | Definición |
-|---|---|
-| Provider | Sistema externo de control de acceso. |
-| Provider Adapter | Traductor entre contratos Tricor y proveedor externo. |
-| ProviderInstallation | Instalación técnica de proveedor para un condominio/caseta. |
-| ProviderCapabilityMatrix | Matriz de capacidades reales disponibles. |
-| ProviderMapping | Relación entre entidad Tricor y entidad externa. |
-| DesiredAccessState | Estado que Tricor desea aplicar. |
-| ObservedAccessState | Estado observado o confirmado desde proveedor/Edge. |
-| AccessCommand | Comando de negocio de acceso. |
-| ProviderOperation | Operación técnica enviada a proveedor. |
-| Drift | Diferencia entre estado deseado y estado observado. |
-
----
-
-## 54. Decisión final v0.1
-
-La estrategia oficial queda así:
+### 28.1 Provider-neutral tests
 
 ```text
-1. Tricor Hábitat será provider-neutral desde arquitectura.
-2. ZKTeco / CVSecurity será proveedor objetivo de implementación v1 mediante Edge.
-3. Hikvision seguirá como research track prioritario hasta validar laboratorio.
-4. Todo proveedor debe pasar por ProviderCapabilityMatrix.
-5. Todo proveedor debe usar ProviderMapping explícito.
-6. Todo comando debe pasar por AccessCommand y ProviderOperation.
-7. Todo estado debe distinguir desired vs observed.
-8. Todo cambio externo debe estar auditado.
-9. QA Harness será gate obligatorio.
-10. El dominio nunca dependerá del proveedor.
+qa:provider:capability-matrix
+qa:provider:mapping-validation
+qa:provider:apply-access-profile
+qa:provider:revoke-credential
+qa:provider:restore-credential
+qa:provider:remote-open-capability-gate
+qa:provider:observed-state
+qa:provider:drift-detection
+```
+
+### 28.2 ZKTeco provider tests
+
+```text
+qa:provider:zkteco:person
+qa:provider:zkteco:card
+qa:provider:zkteco:access-level
+qa:provider:zkteco:door
+qa:provider:zkteco:transaction
+qa:provider:zkteco:visitor-qr
+qa:provider:zkteco:remote-open-lab-only
+```
+
+### 28.3 Hikvision provider tests
+
+```text
+qa:provider:hikvision:user-info
+qa:provider:hikvision:card-info
+qa:provider:hikvision:door-right-right-plan
+qa:provider:hikvision:remote-control-door-lab-only
+qa:provider:hikvision:acs-event
+qa:provider:hikvision:qr-code-event
+qa:provider:hikvision:remote-check
+```
+
+### 28.4 Payment tests to coordinate
+
+Payment provider tests live in payment QA, but must trigger access workflow tests:
+
+```text
+qa:payments:mercado-pago:webhook-signature
+qa:payments:mercado-pago:get-payment-or-order
+qa:flow:payment-confirmed-restores-access
+qa:flow:payment-confirmed-edge-offline
 ```
 
 ---
 
-## 55. Próximo documento recomendado
+## 29. Provider activation rules
 
-Después de este documento, el siguiente recomendado es:
-
-```text
-PROVIDER_ZKTECO_CVSECURITY_ADAPTER_SPEC_V0.1.md
-```
-
-Ese documento debe definir específicamente:
+Un provider installation solo puede pasar a ACTIVE si cumple:
 
 ```text
-- instalación Edge
-- autenticación técnica
-- mappings mínimos
-- operaciones soportadas
-- comandos canónicos aplicables
-- smoke tests
-- restricciones
-- QA provider contract
-- errores esperados
-- seguridad
+1. ProviderInstallation configurada.
+2. Edge asignado si connectionMode = EDGE_LOCAL.
+3. Credentials/secretRefs válidos.
+4. Capabilities consultadas o cargadas desde lab.
+5. Required mappings completos.
+6. QA provider-contract PASS.
+7. No existen BLOCKED mappings.
+8. Remote open deshabilitado si no pasó hardware smoke.
+9. Observed state marcado como PARTIAL si no hay lectura confiable de eventos.
 ```
 
-No debe implementarse antes de que este documento sea aceptado como base de estrategia.
+---
 
+## 30. Estados por proveedor
+
+| Provider | Documento base | Estado documental | Estado implementación | Siguiente paso |
+|---|---|---:|---:|---|
+| ZKTeco / CVSecurity | `PROVIDER_ZKTECO_CVSECURITY_ADAPTER_SPEC_V0.1.md` | CERTIFIED | BLOCKED hasta lab PASS | ejecutar lab plan cuando haya entorno |
+| Hikvision ISAPI PBAC | `PROVIDER_RESEARCH_HIKVISION_V0.1.md` | CERTIFIED | BLOCKED hasta lab | crear lab plan futuro si se decide avanzar |
+| Mercado Pago | `PAYMENT_PROVIDER_RESEARCH_MERCADO_PAGO_V0.1.md` | CERTIFIED_FOR_RESEARCH | BLOCKED hasta sandbox/OAuth/webhook | actualizar QA Harness |
+| Generic Mock | requerido por QA | REQUIRED | pendiente de implementación | implementar antes de providers reales |
+
+---
+
+## 31. Archivos dependientes recomendados
+
+Este documento exige actualizar después, uno por uno:
+
+```text
+1. QA_HARNESS_SPEC_V0.1.md
+2. ROADMAP_V0.1.md
+3. AI_AGENT_RULES_AND_HANDOFF.md
+4. README.md
+```
+
+No se actualizan en esta tarea.
+
+---
+
+## 32. Reglas para Claude Code CLI
+
+Claude Code CLI debe seguir estas reglas cuando implemente providers:
+
+```text
+1. No implementar provider real si ProviderCapabilityMatrix no está definida.
+2. No implementar remote open sin hardware-smoke plan.
+3. No copiar mapping ZKTeco hacia Hikvision.
+4. No tratar Mercado Pago como AccessProvider.
+5. No guardar secretos en código, docs ni logs.
+6. No exponer endpoints de proveedor en UI normal.
+7. No usar provider fields dentro de packages/domain.
+8. No declarar DONE sin QA Harness.
+9. No ejecutar operaciones destructivas sin flag explícito y ambiente lab.
+10. No asumir que DOCUMENTED = AVAILABLE en la instalación real.
+```
+
+---
+
+## 33. Estado final del documento
+
+```text
+PROVIDER_STRATEGY_AND_CANONICAL_CONTRACTS_V0.1.md
+Estado: CERTIFIED
+Implementación provider real: BLOCKED hasta QA/laboratorio
+Siguiente archivo recomendado: QA_HARNESS_SPEC_V0.1.md
+```

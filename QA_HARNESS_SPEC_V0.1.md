@@ -2,278 +2,146 @@
 
 **Proyecto:** Tricor Hábitat  
 **Versión del documento:** v0.1  
-**Estado:** Draft formal inicial / fuente de verdad provisional del QA Harness  
-**Fecha:** 2026-06-10  
-**Documentos padre:** `PROJECT_CHARTER_TRICOR_HABITAT.md`, `DOMAIN_MODEL_V0.1.md`, `ACCESS_POLICY_CONFIGURATION_V0.1.md`, `CLOUD_EDGE_ARCHITECTURE_V0.1.md`  
-**Preparado para:** Arquitectura, backend, Edge, provider adapters, pagos, configuración, CI/CD, documentación histórica y handoff posterior a Claude Code CLI  
-**Idioma base:** Español  
+**Estado documental:** CERTIFIED como especificación base del QA Harness  
+**Estado de implementación:** BLOCKED hasta construir CLI, fixtures, mocks y suites reales  
+**Fecha:** 2026-06-11  
+**Archivo autoritativo:** `QA_HARNESS_SPEC_V0.1.md`  
+**Preparado para:** arquitectura, backend, Edge, provider adapters, pagos, configuración, CI/CD, documentación histórica y handoff posterior a Claude Code CLI  
+
+---
+
+## 0. Control de auditoría
+
+### 0.1 Veredicto de actualización
+
+```text
+Fuente: repositorio Tricor-Habit + documentos base de proveedores/pagos ya asentados
+Veredicto: MATCH
+Motivo: QA Harness debía absorber provider contract tests reales, pagos/webhooks/consulta de pago, Edge, configuración, ZKTeco/CVSecurity 2025 e Hikvision ISAPI PBAC.
+```
+
+### 0.2 Archivos fuente usados
+
+Este documento se alinea con:
+
+```text
+PROJECT_CHARTER_TRICOR_HABITAT.md
+DOMAIN_MODEL_V0.1.md
+ACCESS_POLICY_CONFIGURATION_V0.1.md
+CLOUD_EDGE_ARCHITECTURE_V0.1.md
+PAYMENT_PROVIDER_RESEARCH_MERCADO_PAGO_V0.1.md
+PROVIDER_RESEARCH_HIKVISION_V0.1.md
+PROVIDER_ZKTECO_CVSECURITY_ADAPTER_SPEC_V0.1.md
+PROVIDER_ZKTECO_CVSECURITY_LAB_TEST_PLAN_V0.1.md
+PROVIDER_STRATEGY_AND_CANONICAL_CONTRACTS_V0.1.md
+```
+
+### 0.3 Archivos no tocados por esta actualización
+
+Esta actualización solo modifica:
+
+```text
+QA_HARNESS_SPEC_V0.1.md
+```
+
+No modifica:
+
+```text
+PROJECT_CHARTER_TRICOR_HABITAT.md
+DOMAIN_MODEL_V0.1.md
+ACCESS_POLICY_CONFIGURATION_V0.1.md
+CLOUD_EDGE_ARCHITECTURE_V0.1.md
+PAYMENT_PROVIDER_RESEARCH_MERCADO_PAGO_V0.1.md
+PROVIDER_RESEARCH_HIKVISION_V0.1.md
+PROVIDER_ZKTECO_CVSECURITY_ADAPTER_SPEC_V0.1.md
+PROVIDER_ZKTECO_CVSECURITY_LAB_TEST_PLAN_V0.1.md
+PROVIDER_STRATEGY_AND_CANONICAL_CONTRACTS_V0.1.md
+ROADMAP_V0.1.md
+AI_AGENT_RULES_AND_HANDOFF.md
+REPO_STRUCTURE_V0.1.md
+USER_MANUAL_PLAN.md
+README.md
+DOCS_INDEX_AND_DEPENDENCY_MAP.md
+```
 
 ---
 
 ## 1. Propósito del documento
 
-Este documento define la especificación inicial del **QA Harness** de Tricor Hábitat.
+Este documento define la especificación formal del **QA Harness** de Tricor Hábitat.
 
-El QA Harness es la herramienta técnica que debe impedir que el desarrollo avance por parches, suposiciones o validaciones manuales incompletas. Debe convertir los flujos críticos del producto en pruebas reproducibles, auditables y entendibles para humanos y agentes de código.
+El QA Harness es la herramienta técnica que debe impedir que el desarrollo avance por parches, suposiciones o validaciones manuales incompletas. Debe convertir flujos críticos en pruebas reproducibles, auditables y entendibles para humanos y agentes de código.
 
-Este documento debe servir como fuente de verdad para:
-
-- Diseño del CLI de QA.
-- Flujos de prueba end-to-end.
-- Pruebas de configuración.
-- Pruebas de pagos.
-- Pruebas de morosidad.
-- Pruebas de accesos.
-- Pruebas de credenciales.
-- Pruebas de Guard y Resident.
-- Pruebas Cloud + Edge.
-- Pruebas de provider contracts.
-- Pruebas de capability matrix.
-- Pruebas de seguridad, roles y auditoría.
-- Reportes automáticos para revisión humana y agentes de código.
-- Reglas de aceptación para cambios implementados por Claude Code CLI.
-
-No es todavía la implementación final. Es la especificación base que debe guiar la creación del QA Harness antes de desarrollar módulos críticos.
-
----
-
-## 2. Definición del QA Harness
-
-El QA Harness de Tricor Hábitat es un conjunto de herramientas CLI, fixtures, mocks, validadores, runners y reportes que permiten probar el sistema completo con flujos controlados.
-
-Debe poder responder preguntas como:
+El QA Harness debe validar:
 
 ```text
-¿El backend está sano?
-¿La base de datos está conectada?
-¿Las migraciones están aplicadas?
-¿La configuración del condominio es válida?
-¿La política de morosidad genera el perfil correcto?
-¿El pago confirmado restaura accesos?
-¿El pago manual requiere revisión?
-¿El Edge ejecuta comandos correctamente?
-¿El proveedor soporta la capacidad requerida?
-¿El mapping del proveedor está completo?
-¿Guard ve el estado correcto?
-¿Resident ve el estado correcto?
-¿Se registró auditoría?
-¿La misma operación es idempotente?
-¿Se rompió un flujo existente?
+- dominio canónico
+- configuración y Policy Engine
+- pagos y webhooks
+- morosidad y restauración
+- credenciales
+- QR residente/invitado
+- Edge y modo offline
+- provider contracts
+- capability matrix
+- auditoría
+- seguridad/roles
+- observabilidad
 ```
 
-El QA Harness no debe ser una herramienta decorativa. Debe ser un requisito obligatorio para aceptar cambios.
+Este documento no implementa el QA Harness. Es la fuente de verdad para construirlo.
 
 ---
 
-## 3. Principio rector
+## 2. Principio rector
 
 ```text
 No se acepta ningún cambio crítico si no puede probarse con QA Harness.
 ```
 
-El proyecto debe pasar de este ciclo:
-
-```text
-Prompt → parche → prueba manual → falla → otro parche
-```
-
-a este ciclo:
+El ciclo correcto del proyecto es:
 
 ```text
 Contrato → fixture → flujo QA → fallo exacto → fix mínimo → regresión → reporte
 ```
 
-El QA Harness debe ser el mecanismo que mantenga limpio el proyecto cuando sea implementado por agentes de código.
-
----
-
-## 4. Principios obligatorios
-
-### 4.1 Pruebas reproducibles
-
-Toda prueba debe poder repetirse con los mismos datos, mismos pasos y mismo resultado esperado.
-
-No se deben depender de datos manuales sueltos ni de un estado desconocido de la base de datos.
-
----
-
-### 4.2 Mock-first
-
-Las pruebas diarias no deben depender de hardware real ni de proveedores reales.
-
-Debe existir:
+No se acepta el ciclo:
 
 ```text
-Provider mock
-Edge simulator
-Payment provider mock
-Storage mock
-```
-
-El proveedor real se prueba solo mediante smoke tests controlados.
-
----
-
-### 4.3 Provider-neutral
-
-El dominio de Tricor Hábitat no debe cambiar porque cambie el proveedor.
-
-El QA Harness debe validar que:
-
-```text
-Tricor Domain → Provider Adapter → Provider Mock/Real
-```
-
-funcione sin contaminar el dominio con detalles específicos del proveedor.
-
----
-
-### 4.4 Configuración validada
-
-Toda configuración crítica debe pasar por validación.
-
-El QA Harness debe probar:
-
-```text
-Configuraciones válidas
-Configuraciones inválidas
-Dependencias
-Conflictos
-Capacidades no soportadas
-Mappings incompletos
-Cambios de configuración con impacto operativo
+prompt → parche → prueba manual → error → otro parche
 ```
 
 ---
 
-### 4.5 Auditoría obligatoria
+## 3. Estados documentales y de ejecución
 
-Toda acción sensible debe generar auditoría.
-
-Ejemplos:
+### 3.1 Estado del documento
 
 ```text
-Aprobar pago manual
-Restaurar acceso
-Suspender acceso
-Crear excepción temporal
-Apertura manual
-Archivar residente
-Bloquear credencial perdida
-Cambiar mapping de proveedor
-Cambiar política de morosidad
+Documento QA_HARNESS_SPEC_V0.1.md: CERTIFIED como especificación base.
 ```
 
-El QA Harness debe fallar si la acción ocurre sin auditoría.
-
----
-
-### 4.6 Idempotencia
-
-Los comandos críticos deben ser idempotentes.
-
-Ejemplo:
+### 3.2 Estado de implementación
 
 ```text
-Enviar dos veces el mismo comando de restauración no debe duplicar permisos ni generar estados inconsistentes.
+Implementación QA Harness: BLOCKED hasta bootstrap del repo.
 ```
 
-El QA Harness debe probar comandos repetidos, webhooks repetidos y reconexiones de Edge.
-
----
-
-### 4.7 Separación Cloud / Edge / Proveedor
-
-El QA Harness debe verificar que se mantenga esta separación:
+### 3.3 Estado de pruebas reales
 
 ```text
-Cloud = fuente de verdad
-Edge = ejecutor local y observador
-Proveedor = sistema externo de control de acceso
-```
-
-Edge no debe decidir morosidad, pagos ni reglas de negocio.
-
----
-
-### 4.8 Seguridad por defecto
-
-El QA Harness debe probar seguridad básica desde el inicio:
-
-```text
-Tenant isolation
-Role-based access
-Provider credentials no expuestas
-Logs sin secretos
-Support access auditado
-Guard sin permisos administrativos
-Resident sin acceso a datos de otras propiedades
+Provider real tests: BLOCKED hasta laboratorio.
+Payment real/sandbox tests: BLOCKED hasta credenciales sandbox y webhooks.
+CI tests: BLOCKED hasta repo técnico.
 ```
 
 ---
 
-## 5. Alcance v1 del QA Harness
-
-### 5.1 En alcance
-
-El QA Harness v1 debe incluir:
-
-```text
-1. CLI de QA.
-2. Health checks.
-3. Fixtures determinísticos.
-4. Reset/cleanup seguro de datos QA.
-5. API client para pruebas.
-6. DB inspector de solo lectura para asserts.
-7. Flow runner.
-8. Assertion engine.
-9. Report builder Markdown/JSON.
-10. PolicyConfigValidator test runner.
-11. Provider mock.
-12. Edge simulator.
-13. Payment provider mock.
-14. Storage mock para comprobantes.
-15. Suites de configuración.
-16. Suites de pagos.
-17. Suites de morosidad.
-18. Suites de credenciales.
-19. Suites de Guard/Resident.
-20. Suites de Cloud + Edge.
-21. Provider contract tests.
-22. Smoke test opcional con proveedor real.
-23. CI gate mínimo.
-```
-
----
-
-### 5.2 Fuera de alcance v1
-
-No entra en QA Harness v1:
-
-```text
-1. Pruebas visuales pixel-perfect.
-2. Pruebas de carga avanzadas.
-3. Pruebas móviles nativas Flutter.
-4. Pruebas de tiendas App Store / Play Store.
-5. Automatizaciones libres por cliente.
-6. Pruebas de facturación fiscal propia.
-7. Pruebas de módulos de amenidades como funcionalidad completa.
-8. Pruebas de chat entre residentes.
-9. Pruebas de integraciones futuras no aprobadas.
-```
-
----
-
-## 6. Ubicación recomendada en el repo
-
-Estructura recomendada:
+## 4. Ubicación objetivo en el repo
 
 ```text
 tricor-habitat/
 ├── apps/
-│   ├── api/
-│   ├── web/
-│   ├── edge/
 │   └── qa/
 │       ├── src/
 │       │   ├── cli.ts
@@ -283,17 +151,14 @@ tricor-habitat/
 │       │   ├── flows/
 │       │   ├── suites/
 │       │   ├── mocks/
+│       │   ├── provider-contracts/
+│       │   ├── payments/
+│       │   ├── edge/
 │       │   ├── assertions/
 │       │   ├── reporters/
 │       │   └── utils/
 │       ├── package.json
 │       └── README.md
-├── packages/
-│   ├── contracts/
-│   ├── domain/
-│   ├── db/
-│   ├── provider-sdk/
-│   └── config/
 └── artifacts/
     └── qa/
 ```
@@ -302,63 +167,17 @@ El QA Harness puede iniciar en `apps/qa`. Si crece, partes reutilizables pueden 
 
 ---
 
-## 7. Comandos CLI recomendados
-
-La interfaz principal debe ser simple.
-
-```text
-pnpm qa health
-pnpm qa seed
-pnpm qa reset
-pnpm qa flow property-debt-access-lifecycle
-pnpm qa flow manual-payment-fallback-lifecycle
-pnpm qa config defaults
-pnpm qa config valid
-pnpm qa config invalid
-pnpm qa config dependencies
-pnpm qa provider-contract zkteco
-pnpm qa provider-contract hikvision --mock
-pnpm qa edge health
-pnpm qa edge offline-reconnect
-pnpm qa payments mercado-pago --mock
-pnpm qa report
-pnpm qa ci
-```
-
-También pueden existir scripts alias:
-
-```text
-pnpm qa:health
-pnpm qa:ci
-pnpm qa:flow:core
-pnpm qa:config
-pnpm qa:edge
-pnpm qa:provider
-pnpm qa:payments
-```
-
-Regla:
-
-```text
-Los comandos deben ser legibles para humanos y fáciles de pegar en Claude Code CLI.
-```
-
----
-
-## 8. Ambientes de ejecución
-
-El QA Harness debe reconocer ambientes explícitos.
+## 5. Ambientes de ejecución
 
 ```text
 local
 ci
 staging
 hardware-smoke
+payment-sandbox
 ```
 
-### 8.1 Local
-
-Para desarrollo diario.
+### 5.1 local
 
 Usa:
 
@@ -371,64 +190,125 @@ Payment mock
 Storage mock
 ```
 
----
-
-### 8.2 CI
-
-Para validación automática.
+### 5.2 ci
 
 Usa:
 
 ```text
-Base de datos efímera
-Servicios mock
-Fixtures determinísticos
-Sin proveedor real
+Base efímera
+Mocks obligatorios
 Sin hardware real
+Sin pagos reales
+Sin apertura física
 ```
 
----
-
-### 8.3 Staging
-
-Para pruebas previas a piloto.
+### 5.3 staging
 
 Usa:
 
 ```text
 API staging
 Base staging
-Edge staging o simulator
-Provider mock por default
-Payment sandbox/mock
+Payment sandbox
+Provider mock por defecto
+Edge staging opcional
 ```
 
----
-
-### 8.4 Hardware smoke
-
-Solo para pruebas controladas.
+### 5.4 hardware-smoke
 
 Usa:
 
 ```text
-Proveedor real
 Edge real
-Credenciales de prueba
-Puertas o perfiles de prueba
+Proveedor real
+Credenciales de laboratorio
+Puerta/perfil/persona/tarjeta de prueba
 ```
 
-No debe ejecutarse automáticamente en cada PR.
+Nunca se ejecuta automáticamente en cada PR.
+
+### 5.5 payment-sandbox
+
+Usa:
+
+```text
+Mercado Pago sandbox
+Webhook público controlado
+Credenciales sandbox
+Ordenes de prueba
+Estados simulados o reales sandbox
+```
 
 ---
 
-## 9. Variables de entorno requeridas
+## 6. Comandos CLI objetivo
 
-El QA Harness no debe depender de credenciales hardcodeadas.
-
-Ejemplo:
+### 6.1 Comandos base
 
 ```text
+pnpm qa health
+pnpm qa seed
+pnpm qa reset
+pnpm qa report
+pnpm qa ci
+```
+
+### 6.2 Configuración
+
+```text
+pnpm qa config defaults
+pnpm qa config valid
+pnpm qa config invalid
+pnpm qa config dependencies
+pnpm qa config provider-capabilities
+pnpm qa config impact
+```
+
+### 6.3 Flujos de negocio
+
+```text
+pnpm qa flow property-debt-access-lifecycle
+pnpm qa flow manual-payment-fallback-lifecycle
+pnpm qa flow payment-confirmed-edge-offline
+pnpm qa flow resident-move-out-credential-revocation
+pnpm qa flow lost-credential
+pnpm qa flow guest-qr-morosity-policy
+```
+
+### 6.4 Provider contracts
+
+```text
+pnpm qa provider-contract generic-mock
+pnpm qa provider-contract zkteco --mock
+pnpm qa provider-contract zkteco --hardware-smoke
+pnpm qa provider-contract hikvision --mock
+pnpm qa provider-contract hikvision --hardware-smoke
+```
+
+### 6.5 Pagos
+
+```text
+pnpm qa payments mercado-pago --mock
+pnpm qa payments mercado-pago --sandbox
+pnpm qa payments mercado-pago-webhook --mock
+pnpm qa payments manual-fallback
+```
+
+### 6.6 Edge
+
+```text
+pnpm qa edge health
+pnpm qa edge sync
+pnpm qa edge offline-reconnect
+pnpm qa edge command-idempotency
+pnpm qa edge provider-drift
+```
+
+---
+
+## 7. Variables de entorno QA
+
+```bash
 QA_ENV=local
 QA_BASE_URL=http://localhost:3000
 QA_API_URL=http://localhost:4000
@@ -442,1740 +322,1069 @@ QA_USE_STORAGE_MOCK=true
 QA_ENABLE_DESTRUCTIVE_RESET=false
 ```
 
-Reglas:
+### 7.1 Variables para ZKTeco hardware-smoke
 
-```text
-1. Nunca imprimir secretos en logs.
-2. Nunca usar credenciales reales en fixtures.
-3. Nunca ejecutar reset destructivo fuera de ambiente QA explícito.
-4. Toda variable crítica faltante debe fallar en health check.
+```bash
+QA_ZK_ENABLED=false
+QA_ZK_BASE_URL=https://localhost:8098
+QA_ZK_ACCESS_TOKEN_SECRET_REF=<secret-ref>
+QA_ZK_TEST_DEPT_CODE=2
+QA_ZK_TEST_PERSON_PIN=1
+QA_ZK_TEST_CARD_NO=7325912
+QA_ZK_TEST_DOOR_ID=1
+QA_ZK_ACTIVE_ACC_LEVEL_NAME=Pagador
+QA_ZK_MOROSO_ACC_LEVEL_NAME=Moroso
 ```
-
----
-
-## 10. Estrategia de datos de prueba
-
-### 10.1 Fixtures determinísticos
-
-Los fixtures deben tener nombres y claves predecibles.
-
-Ejemplo:
-
-```text
-qa_condo_core
-qa_private_main
-qa_property_a101
-qa_owner_juan_perez
-qa_credential_tag_001
-qa_credential_resident_qr
-qa_access_profile_active
-qa_access_profile_moroso_default
-qa_edge_main_gate
-qa_provider_installation_mock
-```
-
----
-
-### 10.2 QA Run ID
-
-Cada corrida debe tener un identificador.
-
-```text
-QA_RUN_ID=20260610_qa_001
-```
-
-Toda entidad creada por QA debe quedar marcada con:
-
-```text
-createdBy = QA
-qaRunId = <id>
-```
-
----
-
-### 10.3 Limpieza segura
-
-El QA Harness debe poder limpiar únicamente datos propios.
 
 Regla:
 
 ```text
-Nunca borrar datos que no tengan qaRunId o prefijo QA.
+Nunca imprimir access_token en logs, reportes o snapshots.
 ```
 
-En CI puede usarse base efímera. En local/staging se debe proteger limpieza destructiva.
+### 7.2 Variables para Hikvision hardware-smoke
 
----
+```bash
+QA_HIKVISION_ENABLED=false
+QA_HIKVISION_BASE_URL=http://192.168.x.x
+QA_HIKVISION_AUTH_MODE=digest
+QA_HIKVISION_USERNAME_SECRET_REF=<secret-ref>
+QA_HIKVISION_PASSWORD_SECRET_REF=<secret-ref>
+QA_HIKVISION_TEST_EMPLOYEE_NO=tricor-test-001
+QA_HIKVISION_TEST_CARD_NO=0000000001
+QA_HIKVISION_TEST_DOOR_NO=1
+```
 
-## 11. Componentes internos del QA Harness
-
-### 11.1 CLI
-
-Responsable de recibir comandos, cargar ambiente, ejecutar suites y reportar resultados.
-
-Archivo sugerido:
+Regla:
 
 ```text
-apps/qa/src/cli.ts
+Basic auth solo se permite en laboratorio o red segura; Digest debe ser ruta preferente.
+```
+
+### 7.3 Variables para Mercado Pago sandbox
+
+```bash
+QA_MP_ENABLED=false
+QA_MP_ENV=sandbox
+QA_MP_ACCESS_TOKEN_SECRET_REF=<secret-ref>
+QA_MP_PUBLIC_KEY_REF=<secret-ref>
+QA_MP_WEBHOOK_SECRET_REF=<secret-ref>
+QA_MP_BASE_URL=https://api.mercadopago.com
 ```
 
 ---
 
-### 11.2 EnvironmentChecker
+## 8. Fixtures determinísticos
+
+Fixtures mínimos:
+
+```text
+qa_condo_real_bilbao
+qa_private_ariatza
+qa_property_a101
+qa_owner_juan_perez
+qa_finance_operator
+qa_condo_admin
+qa_guard
+qa_guard_supervisor
+qa_resident
+qa_credential_tag_001
+qa_credential_resident_qr
+qa_guest_qr_001
+qa_access_profile_active
+qa_access_profile_moroso_default
+qa_access_zone_pedestrian
+qa_access_zone_vehicular
+qa_edge_main_gate
+qa_provider_installation_mock
+qa_payment_provider_mock
+```
+
+Regla:
+
+```text
+Todo fixture debe llevar qaRunId.
+Nunca limpiar datos sin qaRunId fuera de base efímera.
+```
+
+---
+
+## 9. Componentes internos del QA Harness
+
+```text
+CLI
+EnvironmentChecker
+ApiClient
+DbInspector
+FixtureFactory
+FlowRunner
+AssertionEngine
+PolicyConfigTestRunner
+ProviderContractRunner
+PaymentTestRunner
+EdgeSimulator
+ProviderMockServer
+PaymentMockServer
+StorageMock
+ReportBuilder
+```
+
+### 9.1 ProviderContractRunner
+
+Responsable de validar que un proveedor cumple contratos canónicos.
+
+Debe probar:
+
+```text
+validateInstallation
+getCapabilities
+validateMappings
+applyAccessProfile
+revokeCredential
+restoreCredential
+disableCredential
+openDoor
+fetchObservedState
+reconcile
+```
+
+No todos los proveedores soportan todo. La prueba debe respetar ProviderCapabilityMatrix.
+
+### 9.2 PaymentTestRunner
+
+Responsable de validar pagos, webhooks, consulta server-side e idempotencia.
+
+Debe probar:
+
+```text
+create order
+receive webhook
+validate signature
+fetch order/payment by API
+normalize status
+mark payment confirmed
+trigger restore workflow
+reject unverified webhook
+deduplicate repeated webhook
+manual fallback
+```
+
+### 9.3 EdgeSimulator
+
+Responsable de simular:
+
+```text
+heartbeat
+command pull
+command ack
+command result
+provider success
+provider failure
+edge offline
+edge reconnect
+local queue
+observed state
+```
+
+---
+
+## 10. Suites de configuración
+
+### 10.1 qa:config:defaults
+
+Debe validar:
+
+```text
+Preset Estándar
+moroso = peatonal permitido
+moroso = vehicular bloqueado
+moroso = QR invitados bloqueado
+moroso = zonas no esenciales bloqueadas
+pago parcial no restaura por default
+pago proveedor confirmado restaura por default
+transferencia manual fallback habilitable
+```
+
+### 10.2 qa:config:dependencies
+
+Debe validar:
+
+```text
+No activar restauración automática sin proveedor de pago activo.
+No bloquear QR invitados si QR invitados está apagado.
+No activar remote open si provider.remoteDoorOpen = UNSUPPORTED.
+No usar perfil moroso si mapping MOROSO_DEFAULT_PROFILE falta.
+No activar provider real si ProviderCapabilityMatrix contiene UNKNOWN en capacidades core.
+```
+
+### 10.3 qa:config:impact
+
+Debe validar que cambios críticos produzcan vista de impacto:
+
+```text
+cuántas propiedades afectadas
+qué accesos cambian
+qué Edge/proveedor ejecutará comandos
+qué mappings se requieren
+qué incidentes podrían abrirse
+```
+
+---
+
+## 11. Suites de dominio
+
+### 11.1 qa:domain:organization
+
+Prueba:
+
+```text
+Condominio → Privada → Propiedad
+Privada independiente sin romper estructura interna
+propiedad sin privada operativa = inválida
+propietario responsable principal único
+propietario con varias propiedades permitido
+```
+
+### 11.2 qa:domain:credentials
+
+Prueba:
+
+```text
+credenciales limitadas por propiedad
+residente puede reportar tarjeta perdida
+residente no puede emitir tarjeta nueva
+credencial perdida genera revocación/suspensión
+credencial sin uso genera alerta no invasiva
+exresidente revoca credenciales al terminar gracia
+```
+
+### 11.3 qa:domain:morosity
+
+Prueba:
+
+```text
+cargo vencido genera deuda
+periodo de gracia evita suspensión inmediata
+fin de gracia aplica MOROSO_DEFAULT_PROFILE
+pago confirmado restaura
+pago parcial no restaura por default
+manual fallback requiere aprobación
+```
+
+---
+
+## 12. Suites de pagos: Mercado Pago
+
+### 12.1 Principio de pago confirmado
+
+Regla obligatoria:
+
+```text
+Webhook no confirma pago por sí solo.
+Webhook despierta validación.
+Tricor debe consultar Mercado Pago por API antes de restaurar acceso.
+```
+
+### 12.2 Endpoints base a cubrir
+
+Dependiendo del flujo final, QA debe cubrir:
+
+```http
+POST https://api.mercadopago.com/v1/orders
+GET  https://api.mercadopago.com/v1/orders/{order_id}
+GET  https://api.mercadopago.com/v1/payments/{payment_id}
+```
+
+Autenticación:
+
+```http
+Authorization: Bearer <ACCESS_TOKEN>
+```
+
+### 12.3 qa:payments:mercado-pago:create-order
+
+Debe validar:
+
+```text
+PaymentOrder interna creada
+externalReference estable
+idempotencyKey generado
+orden creada con token del condominio
+providerOrderId guardado
+no se mezclan fondos SaaS con fondos de mantenimiento
+```
+
+### 12.4 qa:payments:mercado-pago:webhook-signature
+
+Debe validar:
+
+```text
+webhook con firma válida se acepta
+webhook sin firma se rechaza
+webhook con firma inválida se rechaza
+payload raw se almacena seguro
+x-signature / request id se registran si aplica
+```
+
+### 12.5 qa:payments:mercado-pago:confirm-by-api
+
+Debe validar:
+
+```text
+webhook recibido
+payment_id/order_id extraído
+Tricor consulta API de Mercado Pago
+status acreditado normaliza a PaymentOrder.CONFIRMED
+solo entonces se dispara RestoreAccessWorkflow
+```
+
+Estados esperados:
+
+```text
+approved / paid / processed / accredited → CONFIRMED, según endpoint real y mapping aprobado
+pending / in_process → PENDING_PROVIDER
+rejected / cancelled / expired → FAILED/EXPIRED/CANCELLED
+refunded / charged_back → REVIEW_REQUIRED / ACCESS_RECALC_REQUIRED
+```
+
+### 12.6 qa:payments:mercado-pago:duplicate-webhook
+
+Debe validar:
+
+```text
+mismo webhook dos veces no duplica pago
+mismo payment_id no duplica restauración
+mismo RestoreAccessWorkflow es idempotente
+```
+
+### 12.7 qa:payments:mercado-pago:spei-pending
+
+Debe validar:
+
+```text
+SPEI generado queda PENDING_PROVIDER
+no restaura acceso mientras no esté confirmado
+al confirmarse por API/webhook dispara restauración
+```
+
+### 12.8 qa:payments:manual-fallback
+
+Debe validar:
+
+```text
+residente sube comprobante
+Finance/CondoAdmin aprueba manualmente
+comprobante por sí solo no restaura
+aprobación manual auditada dispara recálculo
+sistema genera RestoreAccessWorkflow si deuda queda saldada
+```
+
+---
+
+## 13. Provider contract: Generic Mock
+
+Debe ser el primer proveedor usado en CI.
+
+Capacidades simuladas:
+
+```text
+personManagement = SUPPORTED
+credentialManagement = SUPPORTED
+accessProfileManagement = SUPPORTED
+remoteDoorOpen = SUPPORTED
+accessEventRead = SUPPORTED
+observedStateRead = SUPPORTED
+guestQr = SUPPORTED
+residentQr = SUPPORTED
+```
+
+Debe permitir inyectar fallas:
+
+```text
+provider offline
+command timeout
+mapping missing
+unsupported capability
+partial success
+drift detected
+```
+
+---
+
+## 14. Provider contract: ZKTeco / CVSecurity
+
+### 14.1 Estado
+
+```text
+Documentación base: CERTIFIED
+Implementación: BLOCKED hasta laboratorio
+QA real: hardware-smoke only
+```
+
+### 14.2 Fuente
+
+```text
+PROVIDER_ZKTECO_CVSECURITY_ADAPTER_SPEC_V0.1.md
+PROVIDER_ZKTECO_CVSECURITY_LAB_TEST_PLAN_V0.1.md
+```
+
+### 14.3 Endpoints contractuales a cubrir
+
+#### Personas
+
+```http
+GET  /api/person/get?pin={pin}&access_token={token}
+GET  /api/person/get/{pin}?access_token={token}
+POST /api/person/add?access_token={token}
+POST /api/person/leave?access_token={token}
+POST /api/person/reinstated?access_token={token}
+```
+
+#### Tarjetas
+
+```http
+GET  /api/card/getCards?pin={pin}&access_token={token}
+GET  /api/card/getCards/{pin}?access_token={token}
+POST /api/card/set?access_token={token}
+```
+
+#### Departamentos
+
+```http
+GET  /api/department/getDepartmentList?pageNo={pageNo}&pageSize={pageSize}&access_token={token}
+GET  /api/department/get?code={code}&access_token={token}
+```
+
+#### Access levels
+
+```http
+GET  /api/accLevel/list?pageNo={pageNo}&pageSize={pageSize}&access_token={token}
+POST /api/accLevel/addLevelPerson?access_token={token}
+POST /api/accLevel/addLevelDoor?access_token={token}
+POST /api/accLevel/syncPerson?access_token={token}
+```
+
+#### Puertas y lectores
+
+```http
+GET  /api/door/list?pageNo={pageNo}&pageSize={pageSize}&access_token={token}
+GET  /api/reader/list?pageNo={pageNo}&pageSize={pageSize}&access_token={token}
+POST /api/door/remoteOpenById?doorId={doorId}&interval={seconds}&access_token={token}
+POST /api/door/remoteOpenByName?doorName={name}&interval={seconds}&access_token={token}
+```
+
+#### Transacciones
+
+```http
+POST /api/transaction/list?access_token={token}
+POST /api/transaction/getDoorTransactionDetail?access_token={token}
+```
+
+#### QR
+
+```http
+POST /api/person/getQrCode/{pin}?access_token={token}
+POST /api/v2/person/getQrCode?pin={pin}&access_token={token}
+POST /api/visRegistration/add?access_token={token}
+POST /api/visRegistration/getQrCode?access_token={token}
+```
+
+#### Entrance control / PSG
+
+```http
+GET  /api/psgGate/allGateState?access_token={token}
+POST /api/psgGate/remoteOpenById?gateId={gateId}&access_token={token}
+POST /api/psgLevel/syncPerson?access_token={token}
+```
+
+PSG queda `CONDITIONAL/LAB_REQUIRED` si no hay gate/pluma configurado.
+
+### 14.4 qa:provider:zkteco:mock
+
+Debe validar el contrato sin hardware:
+
+```text
+validar capabilities mock
+crear persona mock
+asignar tarjeta mock
+aplicar perfil Pagador
+aplicar perfil Moroso
+restaurar Pagador
+leer observed state mock
+probar idempotencia de comandos
+```
+
+### 14.5 qa:provider:zkteco:hardware-smoke
+
+Debe seguir el lab plan:
+
+```text
+T-ZK-001 connectivity/token
+T-ZK-010 departments
+T-ZK-020 person get
+T-ZK-030 card get/set
+T-ZK-040 door/list reader/list
+T-ZK-050 accLevel list Pagador/Moroso
+T-ZK-060 Pagador → Moroso → Pagador
+T-ZK-070 transactions
+T-ZK-080 QR resident/visitor
+T-ZK-090 remote open with operator confirmation
+```
+
+No ejecutar destructivas automáticamente.
+
+---
+
+## 15. Provider contract: Hikvision ISAPI PBAC
+
+### 15.1 Estado
+
+```text
+Research base: CERTIFIED
+Implementación: BLOCKED hasta laboratorio
+QA real: hardware-smoke only
+```
+
+### 15.2 Fuente
+
+```text
+PROVIDER_RESEARCH_HIKVISION_V0.1.md
+Intelligent Security API (Person-Based Access Control) Part 1.pdf
+```
+
+### 15.3 Endpoints contractuales a cubrir
+
+#### Capacidades
+
+```http
+GET /ISAPI/AccessControl/capabilities
+GET /ISAPI/AccessControl/AcsCfg/capabilities?format=json
+GET /ISAPI/AccessControl/UserInfo/capabilities?format=json
+GET /ISAPI/AccessControl/CardInfo/capabilities?format=json
+GET /ISAPI/AccessControl/RemoteControl/door/capabilities
+GET /ISAPI/AccessControl/AcsEvent/capabilities?format=json
+```
+
+#### Personas
+
+```http
+GET  /ISAPI/AccessControl/UserInfo/Count?format=json
+POST /ISAPI/AccessControl/UserInfo/Search?format=json
+POST /ISAPI/AccessControl/UserInfo/Record?format=json
+PUT  /ISAPI/AccessControl/UserInfo/SetUp?format=json
+PUT  /ISAPI/AccessControl/UserInfo/Modify?format=json
+PUT  /ISAPI/AccessControl/UserInfo/Delete?format=json
+PUT  /ISAPI/AccessControl/UserInfoDetail/Delete?format=json
+GET  /ISAPI/AccessControl/UserInfoDetail/DeleteProcess?format=json
+```
+
+#### Tarjetas
+
+```http
+GET  /ISAPI/AccessControl/CardInfo/Count?format=json
+POST /ISAPI/AccessControl/CardInfo/Search?format=json
+POST /ISAPI/AccessControl/CardInfo/Record?format=json
+PUT  /ISAPI/AccessControl/CardInfo/SetUp?format=json
+PUT  /ISAPI/AccessControl/CardInfo/Modify?format=json
+PUT  /ISAPI/AccessControl/CardInfo/Delete?format=json
+```
+
+#### Acceso/permisos
+
+Mapping principal:
+
+```text
+Tricor AccessProfile → Hikvision UserInfo.doorRight + RightPlan
+```
+
+QA debe validar:
+
+```text
+ACTIVE_ACCESS_PROFILE asigna doorRight completo
+MOROSO_DEFAULT_PROFILE deja solo puerta peatonal o doorRight reducido
+REVOKED/EXRESIDENTE aplica estrategia validada por laboratorio
+RightPlan existe y es interpretable
+```
+
+#### Apertura remota
+
+```http
+PUT /ISAPI/AccessControl/RemoteControl/door/<ID>
+```
+
+#### Eventos
+
+```http
+POST /ISAPI/AccessControl/AcsEvent?format=json
+POST /ISAPI/AccessControl/QRCodeEvent?format=json
+PUT  /ISAPI/AccessControl/remoteCheck?format=json
+```
+
+### 15.4 qa:provider:hikvision:mock
+
+Debe validar:
+
+```text
+capabilities mock
+UserInfo upsert
+CardInfo set/delete
+AccessProfile → doorRight + RightPlan
+RemoteControl/door simulated
+AcsEvent observed state
+QRCodeEvent observed event
+remoteCheck simulated
+```
+
+### 15.5 qa:provider:hikvision:hardware-smoke
+
+Debe validar en dispositivo real:
+
+```text
+auth Basic/Digest
+capabilities reales
+crear/buscar persona disposable
+asignar tarjeta disposable
+cambiar doorRight/RightPlan
+remote open con operador presente
+leer AcsEvent
+QRCodeEvent si módulo/dispositivo lo soporta
+revocación segura sin operación destructiva irreversible
+```
+
+`UserInfoDetail/Delete` queda marcado como destructivo y requiere aprobación explícita.
+
+---
+
+## 16. ProviderCapabilityMatrix tests
+
+Debe probar para cada proveedor:
+
+```text
+UNKNOWN no permite activar feature
+UNSUPPORTED oculta/deshabilita configuración
+PARTIAL requiere explicación y fallback
+SUPPORTED requiere QA pass
+SUPPORTED_BY_DOCS no equivale a SUPPORTED_IN_INSTALLATION
+LAB_REQUIRED bloquea producción
+```
+
+### 16.1 Casos obligatorios
+
+```text
+Provider sin remoteDoorOpen → Guard no muestra apertura remota.
+Provider sin guestQr → bloquear QR invitado por proveedor no aplica.
+Provider sin accessProfileManagement → morosidad por cambio de perfil queda bloqueada.
+Provider con accessEventRead UNKNOWN → observed state no se promete como real-time.
+Provider mapping incompleto → instalación no activa.
+```
+
+---
+
+## 17. Edge tests
+
+### 17.1 qa:edge:health
 
 Valida:
 
 ```text
-API disponible
-DB disponible
-Edge simulator disponible
-Provider mock disponible
-Payment mock disponible
-Storage mock disponible
-Variables requeridas
-Migraciones aplicadas
-Versión esperada del schema
+Edge enrollado
+heartbeat activo
+provider status reportado
+config descargada
+snapshot aplicado
 ```
 
----
+### 17.2 qa:edge:offline-reconnect
 
-### 11.3 ApiClient
-
-Cliente para ejecutar acciones reales contra la API.
-
-Debe cubrir:
+Valida:
 
 ```text
-Auth
-Condominios
-Privadas
-Propiedades
-Propietarios/responsables
-Credenciales
-Pagos
-Comprobantes
-Morosidad
-Accesos
-Guard
-Resident
-Edge
-Provider configuration
+Edge offline
+Cloud genera comando
+comando queda PENDING_EDGE_OFFLINE
+se crea incidente
+Edge reconecta
+Edge descarga comando
+Edge ejecuta
+Cloud actualiza observed state
+incidente se resuelve o cambia estado
 ```
 
----
+### 17.3 qa:edge:command-idempotency
 
-### 11.4 DbInspector
-
-Inspector de base de datos para asserts.
-
-Regla:
+Valida:
 
 ```text
-DbInspector puede leer para validar.
-No debe modificar datos salvo en reset/seed controlado.
+mismo commandId ejecutado dos veces no duplica permisos
+provider operation idempotency key preservada
+resultado repetido se normaliza sin error fatal
 ```
 
-Debe validar:
+### 17.4 qa:edge:provider-drift
+
+Valida:
 
 ```text
-Payment status
-Property access state
-DesiredAccessState
-AccessCommand
-ObservedAccessState
-AuditEvent
-OperationalIncident
-Credential status
-Provider mappings
+ObservedAccessState distinto a DesiredAccessState
+se crea drift incident
+reconciliación propone comando correctivo
+no corrige automáticamente si operación es destructiva sin política
 ```
 
 ---
 
-### 11.5 FixtureFactory
+## 18. Flujos E2E obligatorios
 
-Crea datos de prueba consistentes.
+### 18.1 property-debt-access-lifecycle
 
-Debe evitar duplicación manual de fixtures.
-
----
-
-### 11.6 FlowRunner
-
-Ejecuta flujos end-to-end.
-
-Debe soportar:
+Pasos:
 
 ```text
-steps
-assertions
-snapshots
-teardown
-failure diagnostics
-report sections
+crear condominio
+crear privada
+crear propiedad
+asignar responsable
+crear credencial
+crear cargo vencido
+aplicar morosidad
+calcular MOROSO_DEFAULT_PROFILE
+generar DesiredAccessState
+generar AccessCommand
+provider mock aplica restricción
+observed state confirma
+Guard ve acceso restringido
+Resident ve estado moroso
+pago confirmado por proveedor
+Policy Engine recalcula ACTIVE_ACCESS_PROFILE
+provider mock restaura
+Guard/Resident ven acceso activo
+auditoría completa
 ```
 
----
+### 18.2 manual-payment-fallback-lifecycle
 
-### 11.7 AssertionEngine
-
-Centraliza validaciones.
-
-Ejemplos:
+Pasos:
 
 ```text
-expectPaymentStatus(propertyId, PAID)
-expectAccessCapability(propertyId, VEHICULAR, DENIED)
-expectAccessCommandCreated(commandType, propertyId)
-expectAuditEvent(action, actor)
-expectProviderState(profile, credential)
-expectGuardView(propertyId, expectedStatus)
-expectResidentView(propertyId, expectedStatus)
+crear deuda
+residente sube comprobante
+comprobante no restaura
+Finance aprueba manualmente
+pago manual queda APPROVED_MANUAL
+Policy Engine recalcula
+RestoreAccessWorkflow se dispara
+auditoría incluye aprobador
 ```
 
----
+### 18.3 payment-confirmed-edge-offline
 
-### 11.8 PolicyConfigTestRunner
-
-Ejecuta validaciones de configuración.
-
-Debe probar:
+Pasos:
 
 ```text
-presets
-checkboxes
-selectores
-números
-matrices
-capabilities
-conflictos
-reglas de impacto
+propiedad morosa
+Edge offline
+pago confirmado por Mercado Pago mock
+PaymentOrder CONFIRMED
+Access state PAYMENT_CONFIRMED_ACCESS_PENDING
+Command PENDING_EDGE_OFFLINE
+incidente Edge offline
+Edge reconecta
+comando ejecutado
+access state ACTIVE
 ```
 
----
+### 18.4 resident-move-out-credential-revocation
 
-### 11.9 ProviderMockServer
-
-Simula proveedor de acceso.
-
-Debe soportar:
+Pasos:
 
 ```text
-health check
-capabilities
-perfiles de acceso
-puertas
-zonas
-credenciales
-aplicar comandos
-fallas temporales
-fallas permanentes
-provider offline
-estado observado
+propiedad con credenciales activas
+MoveOutWorkflow programado
+gracia activa
+al expirar gracia
+credenciales revocadas/suspendidas
+provider command generado
+exresponsable archivado
+historial preservado
 ```
 
----
+### 18.5 lost-credential
 
-### 11.10 EdgeSimulator
-
-Simula Edge local.
-
-Debe soportar:
+Pasos:
 
 ```text
-enrollment
-heartbeat
-polling de comandos
-cola local
-modo offline
-reconexión
-snapshot local
-ejecución contra provider mock
-reporte de resultados
-logs técnicos
+residente reporta tarjeta perdida
+Credential LOST_REPORTED
+AccessCommand disableCredential
+provider mock desactiva tarjeta
+administración ve alerta
+residente no puede registrar tarjeta nueva
 ```
 
----
+### 18.6 guest-qr-morosity-policy
 
-### 11.11 PaymentProviderMock
-
-Simula proveedor de pagos.
-
-Debe soportar:
+Pasos:
 
 ```text
-payment intent created
-payment pending
-payment approved
-payment rejected
-webhook válido
-webhook duplicado
-webhook inválido
-pago expirado
+propiedad activa genera QR invitado
+propiedad entra en morosidad
+policy blockGuestQr=true
+QR invitado queda inválido
+Guard escanea QR inválido
+Guard ve motivo operativo permitido
+propiedad paga
+QR policy se recalcula
+nuevo QR puede generarse si policy lo permite
 ```
-
-Para v1 el proveedor prioritario de investigación será Mercado Pago, pero el mock debe hablar en contratos canónicos internos.
 
 ---
 
-### 11.12 StorageMock
+## 19. Seguridad y roles
 
-Simula almacenamiento de comprobantes.
+### 19.1 Guard
 
-Debe soportar:
+Pruebas:
 
 ```text
-subida de archivo
-metadata
-URL temporal
-archivo privado
-archivo inexistente
-archivo eliminado/archivado
+Guard no edita residentes
+Guard no edita pagos
+Guard no crea credenciales
+Guard no abre manualmente sin rol supervisor
+Guard puede escanear QR
+Guard puede registrar eventos/rondines
+```
+
+### 19.2 GuardSupervisor
+
+Pruebas:
+
+```text
+GuardSupervisor puede apertura manual con motivo
+GuardSupervisor puede excepción temporal si policy lo permite
+apertura manual genera auditoría
+excepción temporal tiene duración máxima
+CondoAdmin recibe notificación/auditoría
+```
+
+### 19.3 Finance
+
+Pruebas:
+
+```text
+Finance aprueba solo pagos manuales
+Finance no edita permisos directamente
+aprobación manual dispara Policy Engine
+rechazo de comprobante no restaura acceso
+```
+
+### 19.4 Resident
+
+Pruebas:
+
+```text
+Resident solo ve sus propiedades
+Resident puede pagar
+Resident puede subir comprobante
+Resident puede reportar credencial perdida
+Resident no registra nueva tarjeta
+Resident genera QR solo si policy lo permite
 ```
 
 ---
 
-### 11.13 ReportBuilder
+## 20. Reportes QA
 
-Genera reportes legibles.
-
-Debe producir:
+Cada ejecución debe generar:
 
 ```text
 artifacts/qa/latest-report.md
 artifacts/qa/latest-report.json
-artifacts/qa/runs/<runId>/report.md
-artifacts/qa/runs/<runId>/report.json
+```
+
+Reporte mínimo:
+
+```text
+runId
+environment
+commitSha
+suite
+status
+steps
+failures
+warnings
+provider mode
+payment mode
+edge mode
+artifacts
+```
+
+Estados:
+
+```text
+PASS
+FAIL
+SKIPPED_BY_CAPABILITY
+BLOCKED_BY_CONFIGURATION
+BLOCKED_BY_LAB_REQUIRED
+BLOCKED_BY_MISSING_SECRET
 ```
 
 ---
 
-## 12. Reportes obligatorios
+## 21. CI gate mínimo
 
-### 12.1 Markdown report
-
-Debe ser legible para humanos.
-
-Estructura mínima:
-
-```text
-# QA Report
-
-Run ID
-Fecha
-Ambiente
-Git branch
-Git SHA
-Servicios revisados
-Suites ejecutadas
-Resumen PASS/FAIL
-Fallas críticas
-Fallas no críticas
-Flujos ejecutados
-Artefactos generados
-Sugerencia de siguiente acción
-```
-
----
-
-### 12.2 JSON report
-
-Debe ser legible por agentes y CI.
-
-Estructura mínima:
-
-```json
-{
-  "runId": "20260610_qa_001",
-  "environment": "local",
-  "status": "PASS",
-  "startedAt": "2026-06-10T00:00:00.000Z",
-  "finishedAt": "2026-06-10T00:01:30.000Z",
-  "git": {
-    "branch": "main",
-    "sha": "abc123"
-  },
-  "services": [
-    { "name": "api", "status": "PASS" },
-    { "name": "db", "status": "PASS" },
-    { "name": "edge", "status": "PASS" },
-    { "name": "providerMock", "status": "PASS" }
-  ],
-  "suites": [
-    {
-      "name": "qa:flow:property-debt-access-lifecycle",
-      "status": "PASS",
-      "tests": []
-    }
-  ],
-  "failures": [],
-  "artifacts": []
-}
-```
-
----
-
-### 12.3 Failure diagnostics
-
-Cada fallo debe explicar:
-
-```text
-Qué falló
-Qué se esperaba
-Qué ocurrió
-En qué step ocurrió
-Qué entidad fue afectada
-Qué tabla/estado/API lo evidencia
-Qué área probablemente está rota
-Qué archivos o módulos pueden estar involucrados
-```
-
-Ejemplo:
-
-```text
-FAIL: expected AccessCommand RESTORE_ACCESS after payment approved.
-Expected: commandType=RESTORE_ACCESS, propertyId=qa_property_a101.
-Actual: no command found.
-Likely area: PaymentConfirmedHandler → AccessPolicyEvaluator → AccessCommandService.
-```
-
----
-
-## 13. Suites obligatorias v1
-
-### 13.1 Health
-
-Comando:
-
-```text
-pnpm qa health
-```
-
-Debe validar:
-
-```text
-API responde
-DB responde
-Migraciones aplicadas
-Auth funciona
-Storage disponible
-Provider mock disponible
-Edge simulator disponible
-Payment mock disponible
-Variables requeridas presentes
-No hay secrets impresos
-```
-
----
-
-### 13.2 Configuración
-
-Comandos:
-
-```text
-pnpm qa config defaults
-pnpm qa config valid
-pnpm qa config invalid
-pnpm qa config dependencies
-pnpm qa config provider-capabilities
-```
-
-Debe probar:
-
-```text
-Presets Suave, Estándar, Estricto, Personalizado
-Morosidad default
-Pagos online
-Transferencia manual fallback
-QR residente
-QR invitados
-Guard policies
-Credential lifecycle
-Edge policies
-Role policies
-Provider capability matrix
-```
-
----
-
-### 13.3 Dominio
-
-Comando:
-
-```text
-pnpm qa domain
-```
-
-Debe probar:
-
-```text
-Condominio → Privada → Propiedad
-Privada independiente sin romper estructura
-Propietario con varias propiedades
-Propiedad con un responsable principal activo
-Credenciales limitadas por propiedad
-Propiedad al corriente
-Propiedad morosa
-Cambio de responsable
-Periodo de gracia por mudanza
-Archivo histórico sin eliminación destructiva
-```
-
----
-
-### 13.4 Pagos
-
-Comandos:
-
-```text
-pnpm qa payments online-provider --mock
-pnpm qa payments manual-fallback
-```
-
-Debe probar:
-
-```text
-Pago creado
-Pago pendiente
-Pago aprobado por proveedor
-Webhook duplicado
-Webhook inválido
-Pago rechazado
-Pago manual con comprobante
-Pago manual pendiente de revisión
-Finance aprueba pago manual
-Comprobante no restaura por sí solo
-Pago parcial no restaura por default
-```
-
----
-
-### 13.5 Morosidad
-
-Comando:
-
-```text
-pnpm qa morosity
-```
-
-Debe probar:
-
-```text
-Días de gracia
-Vencimiento
-Suspensión automática
-Perfil moroso default
-Peatonal permitido por default
-Vehicular bloqueado por default
-QR invitados bloqueado por default
-Pago confirmado restaura
-Pago pendiente no restaura
-Cambio de política recalcula estado deseado
-```
-
----
-
-### 13.6 Accesos
-
-Comando:
-
-```text
-pnpm qa access
-```
-
-Debe probar:
-
-```text
-ACTIVE_ACCESS_PROFILE
-MOROSO_DEFAULT_PROFILE
-FORMER_RESIDENT_PROFILE
-TEMPORARY_EXCEPTION_PROFILE
-Access zones
-Access capabilities
-DesiredAccessState
-AccessCommand
-ObservedAccessState
-Drift detection
-Provider mapping
-Idempotencia
-```
-
----
-
-### 13.7 QR
-
-Comando:
-
-```text
-pnpm qa qr
-```
-
-Debe probar:
-
-```text
-QR residente dinámico
-QR invitado con expiración
-QR invitado de un solo uso
-QR invitado bloqueado por morosidad
-QR invalidado por cambio de estado
-QR invalidado por residente archivado
-Lectura por Guard
-Resultado visible en Guard
-```
-
----
-
-### 13.8 Credenciales
-
-Comando:
-
-```text
-pnpm qa credentials
-```
-
-Debe probar:
-
-```text
-Límite de credenciales por propiedad
-Credencial activa
-Credencial perdida reportada por residente
-Bloqueo/revocación de credencial perdida
-Administración emite reemplazo
-Credencial de exresidente revocada
-Credencial sin uso genera alerta no invasiva
-Credencial archivada mantiene historial
-```
-
----
-
-### 13.9 Guard
-
-Comando:
-
-```text
-pnpm qa guard
-```
-
-Debe probar:
-
-```text
-Guard normal consulta acceso
-Guard normal escanea QR
-Guard normal no abre sin QR válido
-Guard normal registra evento
-GuardSupervisor apertura manual justificada
-GuardSupervisor excepción temporal justificada
-Motivo obligatorio
-Auditoría completa
-Notificación a CondoAdmin
-Guard no ve información financiera sensible
-Guard no edita residentes
-Guard no edita pagos
-```
-
----
-
-### 13.10 Resident
-
-Comando:
-
-```text
-pnpm qa resident
-```
-
-Debe probar:
-
-```text
-Resident ve deudas propias
-Resident ve multas propias
-Resident no ve otra propiedad no vinculada
-Resident genera QR invitado si política lo permite
-Resident no genera QR invitado si moroso y política bloquea
-Resident sube comprobante
-Comprobante no restaura automático
-Resident reporta tarjeta perdida
-Resident no registra nueva tarjeta
-```
-
----
-
-### 13.11 Edge
-
-Comandos:
-
-```text
-pnpm qa edge health
-pnpm qa edge enrollment
-pnpm qa edge heartbeat
-pnpm qa edge command-queue
-pnpm qa edge offline-reconnect
-pnpm qa edge snapshot
-pnpm qa edge reconciliation
-```
-
-Debe probar:
-
-```text
-Enrollment válido
-Enrollment vencido rechazado
-Tenant isolation
-Heartbeat online
-Offline por ausencia de heartbeat
-Command queue
-Reintentos
-Comando duplicado
-Comando superseded
-Snapshot local
-Reconexión
-Provider disconnected
-UI local técnica sin permisos administrativos
-Logs sin secretos
-```
-
----
-
-### 13.12 Provider contracts
-
-Comandos:
-
-```text
-pnpm qa provider-contract zkteco --mock
-pnpm qa provider-contract hikvision --mock
-```
-
-Debe probar:
-
-```text
-Capabilities
-Health check
-Mapping validation
-Access profiles
-Access zones
-Credentials
-Apply desired state
-Revoke access
-Restore access
-Read observed state
-Temporary provider failure
-Permanent provider failure
-Unsupported capability
-```
-
-Para v1, el proveedor implementado debe ser ZKTeco / CVSecurity. Hikvision queda como research y mock conceptual hasta cerrar investigación.
-
----
-
-### 13.13 Seguridad y roles
-
-Comando:
-
-```text
-pnpm qa security
-```
-
-Debe probar:
-
-```text
-Platform puede ver clientes según rol
-Support access requiere auditoría
-CondoAdmin ve su condominio
-PrivateAdmin ve solo su privada
-Finance aprueba solo pagos manuales
-Guard no edita datos maestros
-Resident solo ve datos propios
-Edge no accede a otro condominio
-Tokens inválidos fallan
-Logs no contienen secretos
-```
-
----
-
-### 13.14 Auditoría
-
-Comando:
-
-```text
-pnpm qa audit
-```
-
-Debe probar auditoría para:
-
-```text
-Pago manual aprobado
-Pago manual rechazado
-Restauración automática
-Suspensión por morosidad
-Apertura manual
-Excepción temporal
-Credencial perdida
-Credencial revocada
-Cambio de política
-Cambio de provider mapping
-Support access
-```
-
----
-
-## 14. Primer flujo oficial: property-debt-access-lifecycle
-
-Comando:
-
-```text
-pnpm qa flow property-debt-access-lifecycle
-```
-
-Este es el flujo principal del producto.
-
-Debe probar el ciclo completo:
-
-```text
-Propiedad al corriente
-→ deuda vencida
-→ morosidad
-→ restricción de accesos
-→ pago confirmado
-→ restauración
-```
-
-### 14.1 Steps obligatorios
-
-```text
-1. Ejecutar health check.
-2. Crear QA run.
-3. Crear condominio QA.
-4. Crear privada QA.
-5. Crear propiedad QA.
-6. Crear propietario/responsable QA.
-7. Asignar credenciales activas QA.
-8. Configurar provider mock.
-9. Configurar Edge simulator.
-10. Configurar Mercado Pago mock como proveedor de pago.
-11. Aplicar preset Estándar de morosidad.
-12. Validar ProviderCapabilityMatrix.
-13. Validar provider mappings.
-14. Crear cuota de mantenimiento.
-15. Confirmar propiedad al corriente.
-16. Verificar ACTIVE_ACCESS_PROFILE.
-17. Marcar cuota como vencida después de días de gracia.
-18. Ejecutar evaluación de morosidad.
-19. Generar MOROSO_DEFAULT_PROFILE.
-20. Verificar peatonal permitido.
-21. Verificar vehicular bloqueado.
-22. Verificar QR invitados bloqueado.
-23. Generar DesiredAccessState.
-24. Crear AccessCommand.
-25. Edge obtiene comando.
-26. Edge aplica comando en provider mock.
-27. Provider mock actualiza estado.
-28. Edge reporta ObservedAccessState.
-29. Guard ve acceso restringido correctamente.
-30. Resident ve estado moroso y deuda.
-31. Generar PaymentIntent mock.
-32. Simular pago aprobado por proveedor.
-33. Procesar webhook.
-34. Validar pago confirmado.
-35. Recalcular estado de propiedad.
-36. Generar DesiredAccessState restaurado.
-37. Crear RestoreAccessCommand.
-38. Edge aplica restauración.
-39. Provider mock refleja acceso activo.
-40. Guard ve acceso activo.
-41. Resident ve acceso activo.
-42. Validar auditoría completa.
-43. Generar reporte Markdown/JSON.
-```
-
-### 14.2 Resultado esperado
-
-```text
-Status: PASS
-Payment: PAID
-Property: ACTIVE
-Access profile: ACTIVE_ACCESS_PROFILE
-Vehicular: ALLOWED
-Pedestrian: ALLOWED
-Guest QR: ALLOWED
-Provider observed state: MATCHES_DESIRED_STATE
-Audit: COMPLETE
-Incidents: none open
-```
-
----
-
-## 15. Flujo manual: manual-payment-fallback-lifecycle
-
-Comando:
-
-```text
-pnpm qa flow manual-payment-fallback-lifecycle
-```
-
-Este flujo valida el escenario real donde el residente transfiere fuera de Tricor y sube comprobante.
-
-### 15.1 Steps obligatorios
-
-```text
-1. Crear propiedad morosa.
-2. Confirmar que tiene restricciones activas.
-3. Crear ManualPaymentAttempt.
-4. Subir comprobante a StorageMock.
-5. Verificar metadata del comprobante.
-6. Confirmar que el comprobante no restaura acceso.
-7. Finance revisa comprobante.
-8. Finance aprueba pago manual.
-9. Sistema cambia pago a APPROVED_MANUAL.
-10. Policy Engine recalcula estado.
-11. Se crea comando de restauración.
-12. Edge aplica comando.
-13. Provider mock confirma restauración.
-14. Auditoría registra aprobación manual.
-15. Resident ve pago aplicado.
-16. Guard ve acceso activo.
-```
-
-### 15.2 Resultado esperado
-
-```text
-El comprobante por sí solo no restaura.
-La aprobación manual auditada sí dispara recálculo y restauración.
-Finance no edita permisos directamente.
-```
-
----
-
-## 16. Flujo Edge offline: payment-confirmed-edge-offline
-
-Comando:
-
-```text
-pnpm qa flow payment-confirmed-edge-offline
-```
-
-Debe probar:
-
-```text
-1. Propiedad morosa.
-2. Edge pasa a OFFLINE.
-3. Pago confirmado por proveedor.
-4. Tricor marca deuda como pagada.
-5. Tricor no marca acceso como aplicado.
-6. Estado queda PAYMENT_CONFIRMED_ACCESS_PENDING.
-7. Se crea incidente operativo Edge offline.
-8. Edge reconecta.
-9. Edge ejecuta comando pendiente.
-10. ObservedAccessState confirma restauración.
-11. Incidente se resuelve.
-```
-
-Resultado esperado:
-
-```text
-Tricor no miente diciendo que el acceso fue restaurado si Edge no lo aplicó todavía.
-```
-
----
-
-## 17. Flujo de exresidente y credenciales obsoletas
-
-Comando:
-
-```text
-pnpm qa flow resident-move-out-credential-revocation
-```
-
-Debe probar:
-
-```text
-1. Propiedad con responsable activo.
-2. Credenciales activas.
-3. Se programa salida/mudanza.
-4. Se aplica periodo de gracia configurado.
-5. Durante gracia, permisos siguen según política.
-6. Al expirar gracia, relación pasa a FORMER_RESIDENT.
-7. Credenciales anteriores se revocan.
-8. Provider mock refleja credenciales revocadas.
-9. QR anteriores quedan inválidos.
-10. Auditoría registra cambio.
-11. Historial se conserva.
-```
-
----
-
-## 18. Flujo de tarjeta perdida
-
-Comando:
-
-```text
-pnpm qa flow lost-credential
-```
-
-Debe probar:
-
-```text
-1. Resident ve credenciales propias.
-2. Resident reporta tag perdido.
-3. Credencial cambia a LOST_REPORTED.
-4. Acceso de esa credencial se revoca.
-5. Administración recibe alerta.
-6. Resident no puede crear credencial nueva.
-7. Administración emite reemplazo.
-8. Credencial anterior queda archivada/revocada.
-9. Auditoría queda completa.
-```
-
----
-
-## 19. ProviderCapabilityMatrix testing
-
-El QA Harness debe validar que Tricor no active configuraciones incompatibles con el proveedor.
-
-Ejemplos:
-
-| Caso | Configuración | Capacidad proveedor | Resultado esperado |
-|---|---|---|---|
-| Bloquear QR invitados | QR invitados activo | soportado | PASS |
-| Bloquear QR invitados | QR invitados apagado | no aplica | FAIL config |
-| Bloquear biometría | proveedor sin biometría | no soportado | FAIL config |
-| Perfil moroso | mapping moroso faltante | incompleto | FAIL activation |
-| Acceso vehicular | zona vehicular no mapeada | incompleto | FAIL activation |
-| Restauración automática | proveedor de pago no conectado | faltante | FAIL config |
-| Edge requerido | Edge no enrolled | faltante | FAIL activation |
-
-Regla:
-
-```text
-Una configuración que no puede ejecutarse en el proveedor no debe activarse como si funcionara.
-```
-
----
-
-## 20. PolicyConfigValidator testing
-
-El QA Harness debe probar dependencias y conflictos.
-
-### 20.1 Dependencias mínimas
-
-```text
-Restauración automática requiere pagos online activos.
-Pagos online requieren proveedor de pago conectado.
-Transferencia manual requiere comprobantes o registro manual de evidencia.
-Bloquear QR invitados requiere QR invitados activo.
-Bloquear acceso vehicular requiere zona vehicular activa.
-Perfil moroso requiere mapping en proveedor.
-Modo offline requiere Edge snapshot activo.
-Smoke test real requiere ambiente hardware-smoke.
-```
-
----
-
-### 20.2 Conflictos mínimos
-
-```text
-No permitir pago online activo sin cuenta de condominio conectada.
-No permitir restaurar por comprobante simple como default.
-No permitir Guard normal con apertura manual sin QR si política lo prohíbe.
-No permitir PrivateAdmin ver otras privadas.
-No permitir Finance editar permisos directamente.
-No permitir Edge administrar residentes/pagos.
-No permitir provider mapping incompleto en piloto.
-```
-
----
-
-## 21. Command state testing
-
-El QA Harness debe probar estados de comando.
-
-Estados mínimos:
-
-```text
-CREATED
-QUEUED_FOR_EDGE
-PENDING_EDGE_OFFLINE
-SENT_TO_EDGE
-APPLIED_UNCONFIRMED
-APPLIED_CONFIRMED
-FAILED_RETRYABLE
-FAILED_PERMANENT
-SUPERSEDED
-CANCELLED
-```
-
-Casos:
-
-```text
-1. Comando creado correctamente.
-2. Comando queda pendiente si Edge offline.
-3. Comando se envía al reconectar.
-4. Comando duplicado no duplica efecto.
-5. Comando viejo queda SUPERSEDED si desired state cambia.
-6. Error temporal reintenta.
-7. Error permanente crea incidente.
-8. APPLIED_UNCONFIRMED se resuelve al recibir confirmación.
-```
-
----
-
-## 22. Observed state y drift detection
-
-El QA Harness debe probar diferencias entre estado deseado y estado observado.
-
-Ejemplo:
-
-```text
-Desired: QR invitados bloqueado
-Observed: QR invitados activo en proveedor
-Resultado: DRIFT_DETECTED + incidente operativo
-```
-
-Casos mínimos:
-
-```text
-1. Desired y observed coinciden.
-2. Observed no llega por proveedor offline.
-3. Observed contradice desired.
-4. Proveedor tiene credencial huérfana.
-5. Proveedor tiene perfil no mapeado.
-6. Reconciliación resuelve drift.
-7. Drift no se oculta sin auditoría.
-```
-
----
-
-## 23. Security testing
-
-### 23.1 Tenant isolation
-
-Casos:
-
-```text
-Condo A no ve Condo B.
-PrivateAdmin de Privada A no ve Privada B.
-Resident de propiedad A no ve propiedad B.
-Edge A no obtiene comandos de Edge B.
-Provider installation A no afecta instalación B.
-```
-
----
-
-### 23.2 Roles
-
-Casos:
-
-```text
-PlatformOwner ve clientes.
-PlatformSupport entra con auditoría.
-CondoAdmin configura condominio.
-PrivateAdmin opera solo su privada.
-Finance aprueba pago manual.
-Finance no edita permisos directamente.
-Guard no edita residentes.
-GuardSupervisor puede apertura manual y excepción temporal con límites.
-Resident reporta credencial perdida.
-Resident no registra nueva credencial.
-```
-
----
-
-### 23.3 Secrets
-
-Casos:
-
-```text
-Logs no imprimen tokens.
-Reportes no imprimen credenciales.
-Errores no exponen connection strings.
-Provider credentials no aparecen en artifacts.
-```
-
----
-
-## 24. UI projection testing
-
-QA Harness no debe hacer pixel testing v1, pero sí debe validar proyecciones/API que alimentan UI.
-
-### 24.1 Tricor Condo
-
-Debe validar que Tricor Condo pueda consultar:
-
-```text
-Propiedades
-Estado de pagos
-Morosidad
-Credenciales
-Alertas de inactividad
-Pagos manuales pendientes
-Estado Edge
-Estado proveedor
-Eventos de auditoría
-```
-
----
-
-### 24.2 Tricor Guard
-
-Debe validar que Tricor Guard reciba:
-
-```text
-Acceso permitido/suspendido
-QR válido/inválido
-Acción recomendada
-Motivos visibles según rol
-Botón de apertura manual solo para supervisor
-```
-
----
-
-### 24.3 Tricor Resident
-
-Debe validar que Tricor Resident reciba:
-
-```text
-Deuda propia
-Multas propias
-Estado de acceso
-QR residente
-QR invitados si permitido
-Comprobantes propios
-Credenciales propias
-```
-
----
-
-## 25. Payment testing
-
-El QA Harness debe tratar pagos como fuente crítica de restauración.
-
-### 25.1 Online provider payment
-
-Estados mínimos:
-
-```text
-CREATED
-PENDING_PROVIDER
-APPROVED
-REJECTED
-EXPIRED
-REFUNDED
-CHARGEBACK
-```
-
-V1 puede no implementar todos los estados avanzados, pero el dominio debe estar preparado.
-
-Casos mínimos v1:
-
-```text
-1. Pago creado.
-2. Pago pendiente no restaura.
-3. Pago aprobado restaura.
-4. Webhook duplicado no duplica restauración.
-5. Webhook inválido se rechaza.
-6. Pago rechazado no restaura.
-7. Pago aprobado con Edge offline queda acceso pendiente.
-```
-
----
-
-### 25.2 Manual fallback
-
-Casos mínimos:
-
-```text
-1. Transferencia manual registrada.
-2. Comprobante subido.
-3. Comprobante queda privado en storage.
-4. Finance aprueba.
-5. CondoAdmin también puede aprobar si tiene permiso.
-6. Sistema recalcula acceso.
-7. Auditoría completa.
-8. Rechazo no restaura.
-```
-
----
-
-## 26. Storage testing
-
-Debe probar comprobantes.
-
-Casos:
-
-```text
-Archivo subido correctamente.
-Metadata guardada correctamente.
-Archivo no se guarda en base de datos como blob principal.
-Archivo privado no es público.
-URL temporal expira.
-Comprobante queda ligado al pago manual.
-Comprobante no restaura acceso solo.
-Archivo de prueba se limpia/archiva correctamente.
-```
-
----
-
-## 27. Performance básico v1
-
-No es prueba de carga avanzada, pero sí debe existir smoke de tiempos razonables.
-
-Casos mínimos:
-
-```text
-Health check termina en tiempo razonable.
-Flow principal termina en tiempo razonable.
-Policy recalculation no tarda excesivamente con fixtures pequeñas.
-Command queue procesa lote QA sin bloqueo.
-```
-
-No definir SLA final en v0.1.
-
----
-
-## 28. CI gate mínimo
-
-Para PRs o cambios importantes, el gate mínimo debe ser:
+Antes de aceptar PR crítico:
 
 ```text
 pnpm lint
 pnpm typecheck
 pnpm test
 pnpm qa health
-pnpm qa config defaults
-pnpm qa config dependencies
-pnpm qa flow property-debt-access-lifecycle
-```
-
-Para cambios en Edge:
-
-```text
-pnpm qa edge health
-pnpm qa edge offline-reconnect
-pnpm qa provider-contract zkteco --mock
-```
-
-Para cambios en pagos:
-
-```text
-pnpm qa payments online-provider --mock
-pnpm qa payments manual-fallback
-```
-
-Para cambios en configuración:
-
-```text
 pnpm qa config valid
 pnpm qa config invalid
-pnpm qa config provider-capabilities
-```
-
----
-
-## 29. Regla de aceptación por área
-
-| Área modificada | QA obligatorio |
-|---|---|
-| Dominio | `pnpm qa domain` + flujo principal |
-| Pagos | `pnpm qa payments` + flujo principal |
-| Morosidad | `pnpm qa morosity` + flujo principal |
-| Accesos | `pnpm qa access` + provider contract |
-| Edge | `pnpm qa edge` + offline-reconnect |
-| Provider adapter | `pnpm qa provider-contract <provider>` |
-| Configuración | `pnpm qa config valid/invalid/dependencies` |
-| Guard | `pnpm qa guard` |
-| Resident | `pnpm qa resident` |
-| Roles/seguridad | `pnpm qa security` |
-| Credenciales | `pnpm qa credentials` |
-
----
-
-## 30. Provider real smoke tests
-
-Debe existir smoke test real, pero no como prueba diaria.
-
-Comando:
-
-```text
-pnpm qa provider-real-smoke zkteco
-```
-
-Debe validar solo operaciones controladas:
-
-```text
-Conexión
-Lectura de capabilities reales
-Mapping de prueba
-Crear perfil/credencial de prueba si aplica
-Revocar/restaurar credencial de prueba
-Leer estado observado
-Limpiar o archivar prueba
-```
-
-Reglas:
-
-```text
-1. Solo ambiente hardware-smoke.
-2. Solo credenciales de prueba.
-3. No tocar residentes reales.
-4. Requiere confirmación explícita.
-5. Genera reporte separado.
-```
-
----
-
-## 31. Manejo de fallos
-
-El QA Harness debe clasificar fallos.
-
-```text
-CRITICAL = rompe flujo principal o seguridad.
-HIGH = rompe módulo importante.
-MEDIUM = afecta escenario secundario.
-LOW = reporte, warning o mejora.
-INFO = dato operativo.
-```
-
-Ejemplos:
-
-```text
-CRITICAL: pago aprobado no restaura acceso.
-CRITICAL: Guard normal puede abrir sin permiso.
-CRITICAL: Condo A ve datos de Condo B.
-HIGH: transferencia manual no genera auditoría.
-HIGH: Edge offline no crea incidente.
-MEDIUM: alerta de credencial sin uso no aparece.
-LOW: texto de reporte incompleto.
-```
-
----
-
-## 32. Reglas para debugging
-
-Cuando falle una prueba, el reporte debe indicar:
-
-```text
-1. Step fallido.
-2. Estado esperado.
-3. Estado actual.
-4. Entidad afectada.
-5. Últimos eventos de dominio.
-6. Últimos comandos Edge.
-7. Últimos eventos de proveedor mock.
-8. Últimos audit logs.
-9. Posibles módulos afectados.
-10. Comando exacto para reproducir.
-```
-
-Esto permite que Claude Code CLI repare con contexto, no a ciegas.
-
----
-
-## 33. Reglas para Claude Code CLI
-
-Cuando este documento se entregue a Claude Code CLI:
-
-1. No implementar flujo crítico sin prueba QA asociada.
-2. No cambiar un contrato canónico sin actualizar QA Harness.
-3. No cambiar configuración sin actualizar `PolicyConfigValidator` y suites.
-4. No tocar provider adapter sin `provider-contract`.
-5. No tocar Edge sin suite Edge.
-6. No tocar pagos sin suite payments.
-7. No tocar roles sin suite security.
-8. No arreglar fallos ocultándolos en fixtures.
-9. No actualizar expected results para hacer pasar una prueba rota sin justificarlo.
-10. No hardcodear datos QA dentro del core.
-11. No usar proveedor real para pruebas diarias.
-12. No imprimir secretos en reportes.
-13. Todo PR debe indicar qué suites se ejecutaron.
-14. Todo fallo debe entregarse con reporte.
-15. Si una suite falla, reparar causa raíz antes de agregar features.
-
----
-
-## 34. Roadmap de implementación del QA Harness
-
-### Fase 0 — Skeleton CLI
-
-Objetivo:
-
-```text
-Crear apps/qa con CLI, config loader, report builder y comandos vacíos.
-```
-
-Criterio de terminado:
-
-```text
-pnpm qa health ejecuta y genera reporte básico.
-```
-
----
-
-### Fase 1 — Health, fixtures y reset seguro
-
-Objetivo:
-
-```text
-Health check real, fixtures determinísticos y cleanup seguro.
-```
-
-Criterio de terminado:
-
-```text
-QA crea y limpia datos propios sin tocar datos externos.
-```
-
----
-
-### Fase 2 — Config y Policy Engine tests
-
-Objetivo:
-
-```text
-Probar presets, dependencias, incompatibilidades y capability matrix.
-```
-
-Criterio de terminado:
-
-```text
-pnpm qa config defaults/valid/invalid/dependencies pasan.
-```
-
----
-
-### Fase 3 — Provider mock y provider contracts
-
-Objetivo:
-
-```text
-Simular proveedor y validar contratos canónicos.
-```
-
-Criterio de terminado:
-
-```text
-pnpm qa provider-contract zkteco --mock pasa.
-```
-
----
-
-### Fase 4 — Edge simulator
-
-Objetivo:
-
-```text
-Simular enrollment, heartbeat, comandos, offline, reconexión y snapshots.
-```
-
-Criterio de terminado:
-
-```text
-pnpm qa edge offline-reconnect pasa.
-```
-
----
-
-### Fase 5 — Payments mock y manual fallback
-
-Objetivo:
-
-```text
-Probar pago online confirmado y transferencia manual auditada.
-```
-
-Criterio de terminado:
-
-```text
-pnpm qa payments online-provider --mock
-pnpm qa payments manual-fallback
-```
-
----
-
-### Fase 6 — Flow principal
-
-Objetivo:
-
-```text
-Implementar property-debt-access-lifecycle de punta a punta.
-```
-
-Criterio de terminado:
-
-```text
-pnpm qa flow property-debt-access-lifecycle pasa.
-```
-
----
-
-### Fase 7 — CI gate
-
-Objetivo:
-
-```text
-Integrar QA mínimo a CI.
-```
-
-Criterio de terminado:
-
-```text
-pnpm qa ci pasa en pipeline.
-```
-
----
-
-### Fase 8 — Smoke real controlado
-
-Objetivo:
-
-```text
-Agregar smoke test real de proveedor implementado.
-```
-
-Criterio de terminado:
-
-```text
-pnpm qa provider-real-smoke zkteco funciona solo en hardware-smoke.
-```
-
----
-
-## 35. Artefactos generados
-
-El QA Harness debe generar:
-
-```text
-artifacts/qa/latest-report.md
-artifacts/qa/latest-report.json
-artifacts/qa/runs/<runId>/report.md
-artifacts/qa/runs/<runId>/report.json
-artifacts/qa/runs/<runId>/logs/
-artifacts/qa/runs/<runId>/snapshots/
-artifacts/qa/runs/<runId>/fixtures.json
-```
-
-Los artefactos no deben contener secretos.
-
----
-
-## 36. Definición de “PASS”
-
-Una suite solo pasa si:
-
-```text
-1. Todos los asserts críticos pasan.
-2. No hay incidentes críticos abiertos inesperados.
-3. No hay secretos en logs.
-4. No hay drift no resuelto.
-5. Los reportes se generaron correctamente.
-6. El cleanup o aislamiento de datos quedó correcto.
-```
-
----
-
-## 37. Definición de “DONE” para el QA Harness v1
-
-El QA Harness v1 se considera listo cuando existen y pasan:
-
-```text
-pnpm qa health
-pnpm qa config defaults
-pnpm qa config valid
-pnpm qa config invalid
-pnpm qa config dependencies
-pnpm qa provider-contract zkteco --mock
-pnpm qa edge offline-reconnect
-pnpm qa payments online-provider --mock
-pnpm qa payments manual-fallback
 pnpm qa flow property-debt-access-lifecycle
-pnpm qa security
-pnpm qa audit
-pnpm qa report
+pnpm qa payments mercado-pago --mock
+pnpm qa provider-contract generic-mock
+pnpm qa edge offline-reconnect
+```
+
+No se ejecuta hardware-smoke en CI normal.
+
+---
+
+## 22. Hardware smoke gate
+
+Hardware-smoke requiere confirmación humana.
+
+Debe preguntar explícitamente:
+
+```text
+¿Confirmas que esta prueba puede abrir una puerta física?
+¿Confirmas que se usará una persona/tarjeta de laboratorio?
+¿Confirmas que el entorno no es producción?
+```
+
+Sin confirmación:
+
+```text
+status = BLOCKED_BY_OPERATOR_CONFIRMATION
 ```
 
 ---
 
-## 38. Relación con documentación de usuario final
+## 23. Reglas para Claude Code CLI
 
-El QA Harness no reemplaza manuales, pero debe ayudar a documentar flujos.
-
-Los reportes de QA pueden usarse como base para:
+Claude Code CLI debe respetar:
 
 ```text
-Manual de Tricor Condo
-Manual de Tricor Guard
-Manual de Tricor Resident
-Manual técnico de Edge
-Manual de soporte Tricor Platform
+1. No implementar proveedor real sin provider contract tests.
+2. No implementar Mercado Pago sin webhook validation + API confirmation test.
+3. No tocar Edge real sin Edge simulator tests.
+4. No declarar success si QA Harness no existe o no pasa.
+5. No agregar configuración sin PolicyConfigValidator tests.
+6. No agregar endpoint sin test de permisos/tenant/auditoría.
+7. No inventar endpoints de proveedor.
+8. No mezclar términos del proveedor en packages/domain.
 ```
 
-Cada flujo validado debe poder convertirse después en documentación operativa.
-
----
-
-## 39. Riesgos si no se implementa
-
-Si Tricor Hábitat avanza sin QA Harness, los riesgos son:
+Reporte obligatorio de Claude:
 
 ```text
-1. Repetir ciclo de parches.
-2. Romper accesos al modificar pagos.
-3. Romper pagos al modificar configuración.
-4. Activar configuraciones no soportadas por proveedor.
-5. Restaurar accesos sin confirmación real.
-6. Revocar accesos sin auditoría.
-7. Permitir acciones indebidas a guardias o residentes.
-8. No detectar credenciales obsoletas.
-9. Confundir estado deseado con estado aplicado.
-10. Entregar un piloto inestable.
-```
-
-Por eso el QA Harness debe crearse temprano, antes de features visuales complejas.
-
----
-
-## 40. Decisiones cerradas en este documento
-
-```text
-1. QA Harness es obligatorio desde el inicio.
-2. Debe vivir como CLI TypeScript en el monorepo.
-3. Debe probar configuración, dominio, pagos, accesos, Edge, proveedor, roles y auditoría.
-4. Debe usar mocks para pruebas diarias.
-5. No debe depender de hardware real para CI.
-6. Debe generar reportes Markdown y JSON.
-7. Debe validar provider capabilities y mappings.
-8. Debe probar el flujo property-debt-access-lifecycle.
-9. Debe probar transferencia manual fallback.
-10. Debe probar Edge offline/reconnect.
-11. Debe probar credenciales perdidas, exresidentes e inactividad.
-12. Debe servir como gate para Claude Code CLI.
+- tarea ejecutada
+- archivos modificados
+- pruebas ejecutadas
+- pruebas no ejecutadas y razón
+- QA report path
+- riesgos pendientes
+- siguiente paso recomendado
 ```
 
 ---
 
-## 41. Pendientes para documentos posteriores
+## 24. Roadmap de implementación del QA Harness
 
-Este documento no define todavía:
+### Fase QA-0 — Bootstrap
 
 ```text
-1. Implementación final del CLI.
-2. Formato definitivo de cada endpoint.
-3. Esquema Prisma final.
-4. Provider adapter real completo.
-5. Estrategia final de Mercado Pago.
-6. Setup final de CI/CD.
-7. Smoke test real detallado.
-8. Manual de operación de QA para humanos.
-9. Matriz final de capacidades por proveedor real.
-10. Política final de retención de artefactos QA.
+apps/qa
+CLI básico
+health check
+report builder
+fixtures iniciales
 ```
 
-Estos temas deben resolverse durante implementación o en documentos técnicos posteriores.
+### Fase QA-1 — Config y dominio
+
+```text
+PolicyConfigValidator runner
+fixtures Condominio/Privada/Propiedad
+morosity policy tests
+credential lifecycle tests
+```
+
+### Fase QA-2 — Provider mock + Edge simulator
+
+```text
+provider mock
+actions applyAccessProfile/openDoor/fetchObservedState
+edge simulator
+command queue tests
+```
+
+### Fase QA-3 — Payment mock
+
+```text
+Mercado Pago mock
+webhook signature simulation
+GET order/payment confirmation simulation
+manual fallback
+```
+
+### Fase QA-4 — Provider contract suites
+
+```text
+ZKTeco mock contract
+Hikvision mock contract
+capability matrix tests
+mapping validation
+```
+
+### Fase QA-5 — Hardware smoke optional
+
+```text
+ZKTeco lab tests
+Hikvision lab tests
+Mercado Pago sandbox tests
+```
 
 ---
 
-## 42. Próximo documento recomendado
+## 25. Definition of Done
 
-Después de este documento, el siguiente entregable recomendado es:
+El QA Harness está listo para MVP técnico cuando:
 
 ```text
-ROADMAP_V0.1.md
+1. Existe CLI ejecutable.
+2. Hay fixtures determinísticos.
+3. Hay reportes md/json.
+4. Hay provider mock.
+5. Hay payment mock.
+6. Hay edge simulator.
+7. Flujos core pasan.
+8. Config inválida falla correctamente.
+9. Webhook duplicado no duplica pagos.
+10. Provider contract generic mock pasa.
+11. Edge offline/reconnect pasa.
+12. Auditoría se valida en flujos críticos.
 ```
 
-Ese documento debe convertir Project Charter, Domain Model, Access Policy Configuration, Cloud/Edge Architecture y QA Harness en fases concretas de desarrollo.
+---
 
+## 26. Estado final del documento
+
+```text
+QA_HARNESS_SPEC_V0.1.md: CERTIFIED como especificación base.
+QA Harness implementation: BLOCKED hasta bootstrap técnico.
+Provider real tests: BLOCKED hasta laboratorio.
+Payment sandbox tests: BLOCKED hasta credenciales sandbox.
+```
